@@ -1,3 +1,5 @@
+PImage ImageBackground_1;
+
 ArrayList<Enemy> enemies;
 ArrayList<Bullet> playerBullets;
 ArrayList<Bullet> enemyBullets;
@@ -14,7 +16,9 @@ int bossHealth = 0;
 boolean bossActive = false;
 
 void setup() {
-  size(800, 600);
+  ImageBackground_1 = loadImage("./data./Weltall-1.png");
+  ImageBackground_1.resize(width, height);
+  size(1000, 600);
   playerX = width / 2;
   playerY = height - 50;
   enemies = new ArrayList<>();
@@ -25,7 +29,8 @@ void setup() {
 }
 
 void draw() {
-  background(20);
+  image(ImageBackground_1,0,0);
+ 
 
   // Spieler zeichnen
   fill(shieldActive ? color(0, 150, 255) : color(0, 255, 0)); // Blau für Schild
