@@ -1,4 +1,4 @@
-// Definition der Klasse Game
+import java.util.ArrayList;
 
 class Game {
   int screen = 0;
@@ -8,6 +8,8 @@ class Game {
   ArrayList<Bullet> enemyBullets;
   ArrayList<PowerUp> powerUps;
 
+  LevelManager levelManager;
+  Level currentLevel;
   Player player;
   StartScreen startScreen;
   LevelScreen levelScreen;
@@ -21,6 +23,7 @@ class Game {
   int nextScreen = 0;
 
   Game() {
+    // Initialisiere alle notwendigen Objekte und Listen
     enemies = new ArrayList<>();
     playerBullets = new ArrayList<>();
     enemyBullets = new ArrayList<>();
@@ -32,12 +35,19 @@ class Game {
     gameOverScreen = new GameOverScreen(this, 0);  // Anfangspunkte = 0
     winScreen = new WinScreen(this);
     introScreen = new IntroScreen(this);
+    levelManager = new LevelManager();
 
     player = new Player();  // Initialisiere den Spieler hier
   }
 
   void setup() {
-    ImageBackground_1 = loadImage("./data./Weltall-1.png");
+  ImageBackground_1 = loadImage("./data./Weltall-1.png");
+    // Sicherstellen, dass das Bild korrekt geladen wurde
+    if (ImageBackground_1 == null) {
+      println("Error: Background image could not be loaded!");
+    } else {
+      println("Background image loaded successfully.");
+    }
     ImageBackground_1.resize(width, height);
     resetGame();  // Spiel zurücksetzen
     frameRate(60);
@@ -48,6 +58,26 @@ class Game {
       renderTransition();
     } else {
       renderScreen();
+    }
+  }
+
+  void startLevel(int levelNumber) {
+    currentLevel = levelManager.getLevel(levelNumber);
+    if (currentLevel == null) {
+      println("Error: Level could not be loaded!");
+      return;
+    }
+    setupLevel();
+  }
+
+  void setupLevel() {
+    background(loadImage(currentLevel.backgroundImagePath));
+    enemies.clear();
+    for (int i = 0; i < currentLevel.enemyCount; i++) {
+      enemies.add(new Enemy(random(30, width - 30), random(20, 100), currentLevel.enemySpeed));
+    }
+    if (currentLevel.bossHealth > 0) {
+      enemies.add(new Boss(width / 2, 80, currentLevel.bossHealth));
     }
   }
 
@@ -128,9 +158,9 @@ class Game {
   }
 
   void triggerTransition(int newScreen) {
-    isTransitioning = true;
-    nextScreen = newScreen;
-  }
+  isTransitioning = true;
+  nextScreen = newScreen;
+}
 
   void resetGame() {
     if (player == null) {
@@ -156,7 +186,7 @@ class Game {
     drawHUD();
 
     if (frameCount % 60 == 0) {
-      enemies.add(new Enemy(random(30, width - 30), random(20, 100)));
+      enemies.add(new Enemy(random(30, width - 30), random(20, 100), currentLevel.enemySpeed));
     }
 
     if (frameCount % (60 * 30) == 0) {
@@ -167,6 +197,7 @@ class Game {
       powerUps.add(new PowerUp(random(50, width - 50), random(50, height - 200), (int) random(1, 3)));
     }
 
+    // PowerUps anzeigen und sammeln
     for (int i = powerUps.size() - 1; i >= 0; i--) {
       PowerUp p = powerUps.get(i);
       p.display();
@@ -176,6 +207,7 @@ class Game {
       }
     }
 
+    // Gegner bewegen und schießen
     for (int i = enemies.size() - 1; i >= 0; i--) {
       Enemy e = enemies.get(i);
       e.update();
@@ -194,6 +226,7 @@ class Game {
       }
     }
 
+    // Spielerprojektile bewegen und Kollisionen überprüfen
     for (int i = playerBullets.size() - 1; i >= 0; i--) {
       Bullet b = playerBullets.get(i);
       b.update();
@@ -210,6 +243,7 @@ class Game {
       if (b.y < 0) playerBullets.remove(i);
     }
 
+    // Gegnerprojektile bewegen und Kollisionen mit dem Spieler überprüfen
     for (int i = enemyBullets.size() - 1; i >= 0; i--) {
       Bullet b = enemyBullets.get(i);
       b.update();

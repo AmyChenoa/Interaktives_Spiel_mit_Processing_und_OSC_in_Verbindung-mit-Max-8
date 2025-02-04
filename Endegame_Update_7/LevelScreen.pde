@@ -8,8 +8,12 @@ class LevelScreen {
   float alpha = 0;  // Transparenz für den Titeltext
 
   // Konstruktor: Initialisiert die Sterne, Buttons und setzt den Game-Referenz
-  LevelScreen(Game g) {
-    this.game = g;  // Speichert die Instanz von Game
+    LevelScreen(Game g) {
+    this.game = g;
+    for (int i = 0; i < 9; i++) {
+      levels[i] = new Button(100 + (i % 3) * 150, 200 + (i / 3) * 100, 100, 50, "Level " + (i + 1));
+    }
+  
 
     // Erstelle die Sterne im Hintergrund
     for (int i = 0; i < stars.length; i++) {
@@ -111,10 +115,13 @@ class LevelScreen {
     // Überprüfe, ob einer der Level-Buttons geklickt wurde
     for (int i = 0; i < 9; i++) {
       if (levels[i].isClicked()) {
+         game.startLevel(i + 1);
         println("Level " + (i + 1) + " Start!");
         // Hier könnte der Code zum Starten des jeweiligen Levels stehen (i + 1)
         // Zum Beispiel: game.startLevel(i + 1);
       }
     }
   }
+  
+  
 }

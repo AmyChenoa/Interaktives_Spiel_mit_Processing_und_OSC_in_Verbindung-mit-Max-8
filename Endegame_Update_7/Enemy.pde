@@ -6,31 +6,31 @@ class Enemy {
   color enemyColor; // Farbe des Gegners
   boolean isExploding = false; // Status, ob der Gegner explodiert
   int explosionFrames = 0; // Zähler für die Explosionsanimation
+  float speed;
 
   // Konstruktor für den Gegner
-  Enemy(float x, float y) {
+  Enemy(float x, float y, float speed) {
     this.x = x;
     this.y = y;
+    this.speed = speed;
     this.enemyColor = color(255, 100, 100); // Standardfarbe Rot
   }
 
   // Aktualisierungsmethode für die Bewegung
   void update() {
     if (!isExploding) {
-      y += 2 + sin(frameCount * 0.1) * 1.5; // Bewegt sich leicht schwankend nach unten
+      y += speed + sin(frameCount * 0.1) * 1.5; // Bewegt sich leicht schwankend nach unten
     }
   }
 
   // Zeichnet den Gegner oder die Explosion
   void display() {
     if (isExploding) {
-      // Zeichnet eine aufblähende Explosion mit abnehmender Deckkraft
       fill(255, random(100, 255), 0, 255 - explosionFrames * 10);
       ellipse(x, y, size + explosionFrames * 5, size + explosionFrames * 5);
       explosionFrames++;
-      if (explosionFrames > 10) isExploding = false; // Explosion nach 10 Frames beenden
+      if (explosionFrames > 10) isExploding = false;
     } else {
-      // Gegner leuchtet leicht in verschiedenen Rottönen
       enemyColor = color(255, random(50, 150), random(50, 150));
       fill(enemyColor);
       ellipse(x, y, size, size);
@@ -49,6 +49,7 @@ class Enemy {
   }
 }
 
+
 // Verbesserte Boss-Klasse mit dynamischer Bewegung, komplexen Angriffsmustern und Lebensanzeige
 class Boss extends Enemy {
   int health; // Lebenspunkte des Bosses
@@ -57,7 +58,7 @@ class Boss extends Enemy {
 
   // Konstruktor für den Boss
   Boss(float x, float y, int health) {
-    super(x, y); // Ruft den Konstruktor der Enemy-Klasse auf
+    super(x, y, 1.5); // Ruft den Konstruktor der Enemy-Klasse auf
     this.size = 80; // Größere Größe für den Boss
     this.health = health; // Setzt die Lebenspunkte
   }
@@ -68,16 +69,6 @@ class Boss extends Enemy {
     x += sin(frameCount * oscillationSpeed) * 8; // Seitliches Schwingen
     y += 0.8 + sin(frameCount * 0.03) * 1.5; // Langsame, unregelmäßige Bewegung nach unten
     oscillationSpeed += 0.0002; // Langsame Beschleunigung der horizontalen Bewegung
-  }
-
-  // Der Boss feuert ein sich drehendes Muster aus 8 Projektile gleichzeitig ab
-  @Override
-  void shoot(ArrayList<Bullet> bullets) {
-    for (int i = 0; i < 8; i++) { // 8 Projektile im Kreis
-      float angle = shootingAngle + (i * PI / 4); // Startwinkel + versetzte Winkel
-      bullets.add(new Bullet(x, y, cos(angle) * 3, sin(angle) * 3, color(255, 150, 0))); // Orangefarbene Kugeln
-    }
-    shootingAngle += PI / 12; // Der Winkel rotiert langsam für ein spiralförmiges Muster
   }
 
   // Boss erleidet Schaden und wird aggressiver
