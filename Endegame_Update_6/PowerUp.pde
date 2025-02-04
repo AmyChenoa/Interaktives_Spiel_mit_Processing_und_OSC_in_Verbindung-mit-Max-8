@@ -1,3 +1,5 @@
+// Definition der Klasse PowerUp
+
 class PowerUp {
   float x, y;                      // Position des Power-Ups
   int type;                         // 1 = Shield, 2 = Multi-Shot

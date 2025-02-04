@@ -1,3 +1,5 @@
+// Definition der Klasse Game
+
 class Game {
   // Aktueller Bildschirmstatus:
   // 0 = Start, 1 = Level, 2 = Hilfe, 3 = Spiel, 4 = Game Over, 5 = Win, 6 = Intro

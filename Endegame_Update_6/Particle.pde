@@ -1,3 +1,5 @@
+// Definition der Klasse Particle
+
 class Particle {
   float x, y;           // Position des Partikels
   float speedX, speedY; // Geschwindigkeit des Partikels in X- und Y-Richtung
