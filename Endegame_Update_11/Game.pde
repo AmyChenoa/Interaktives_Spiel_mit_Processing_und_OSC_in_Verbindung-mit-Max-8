@@ -1,6 +1,6 @@
 class Game {
   int screen = 0;
-  PImage ImageBackground_1;
+  PImage backgroundImage;
   ArrayList<Enemy> enemies;
   ArrayList<Bullet> playerBullets;
   ArrayList<Bullet> enemyBullets;
@@ -14,8 +14,7 @@ class Game {
   WinScreen winScreen;
   IntroScreen introScreen;
 
-  Level level; // Hier das Level-Objekt integrieren
-
+  Level level;
   float transitionProgress = 0;
   boolean isTransitioning = false;
   int nextScreen = 0;
@@ -34,12 +33,12 @@ class Game {
     introScreen = new IntroScreen(this);
     player = new Player();
 
-    level = new Level(1, 10, 60, true); // Beispiel-Level mit Nummer 1, 10 Feinden, Spawnrate 60 und einem Boss
+    level = new Level(1, 6, 90, false); // Anfangslevel
   }
 
   void setup() {
-    ImageBackground_1 = loadImage("./data./Weltall-1.png");
-    ImageBackground_1.resize(width, height);
+    backgroundImage = loadImage("./data./Weltall-1.png");
+    backgroundImage.resize(width, height);
     resetGame();
     frameRate(60);
   }
@@ -137,12 +136,11 @@ class Game {
   }
 
   void playGame() {
-    image(ImageBackground_1, 0, 0);
+    image(backgroundImage, 0, 0);
     player.update();
     player.display();
     drawHUD();
 
-    // Level wird hier initialisiert und verwaltet
     if (frameCount % level.spawnRate == 0) {
       for (int i = 0; i < level.enemyCount; i++) {
         enemies.add(new Enemy(random(30, width - 30), random(20, 100)));
@@ -157,6 +155,7 @@ class Game {
           if (boss.isDead()) {
             player.score += 500;
             enemies.remove(e);
+            triggerTransition(5);
             break;
           }
         }
@@ -179,30 +178,16 @@ class Game {
       if (frameCount % 30 == 0) e.shoot(enemyBullets);
       if (e.y > height) enemies.remove(i);
 
-      if (e instanceof Boss) {
-        Boss boss = (Boss) e;
-        boss.takeDamage();
-        if (boss.isDead()) {
-          enemies.remove(i);
-          player.score += 500;
-          triggerTransition(5); // Wechsel zu Win-Screen
-        }
-      }
-
       for (int k = playerBullets.size() - 1; k >= 0; k--) {
         Bullet b = playerBullets.get(k);
         b.update();
         b.display();
-        for (int j = enemies.size() - 1; j >= 0; j--) {
-          Enemy enemy = enemies.get(j);
-          if (dist(b.x, b.y, enemy.x, enemy.y) < enemy.size / 2) {
-            enemies.remove(j);
-            player.score += 10;
-            playerBullets.remove(k);
-            break;
-          }
+        if (dist(b.x, b.y, e.x, e.y) < e.size / 2) {
+          enemies.remove(i);
+          player.score += 10;
+          playerBullets.remove(k);
+          break;
         }
-        if (b.y < 0) playerBullets.remove(k);
       }
     }
 
@@ -217,7 +202,6 @@ class Game {
           triggerTransition(4);
         }
       }
-      if (b.y > height) enemyBullets.remove(i);
     }
   }
 
@@ -245,6 +229,7 @@ class Game {
     drawLives(100, 50, 22, player.lives);
   }
 }
+
 
 // Power-Up Timer für ein aktives Power-Up
 void drawPowerUpTimer(float x, float y, float barWidth, float barHeight, float timer, float maxTimer, color barColor) {
