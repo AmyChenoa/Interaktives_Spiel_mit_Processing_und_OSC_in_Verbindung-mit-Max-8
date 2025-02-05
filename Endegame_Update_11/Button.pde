@@ -23,28 +23,18 @@ class Button {
     this.label = label;
   }
 
-  // Methode zum Zeichnen des Buttons auf dem Bildschirm
   void display() {
-    // Entferne die Umrandung des Buttons
-    noStroke();
+    // Setze die weiße Umrandung für den Button
+    stroke(255); // Weiße Umrandung
+    strokeWeight(1); // Dünne Umrandung
+    fill(mouseOver() ? color(0, 255, 150) : color(50)); // Füllfarbe ändern
+    rect(x, y, w, h, 10); // Rechteck mit abgerundeten Ecken zeichnen
 
-    // Setzt die Füllfarbe je nachdem, ob sich die Maus über dem Button befindet
-    fill(mouseOver() ? color(0, 255, 150) : color(50));
-
-    // Zeichnet den Button als Rechteck mit abgerundeten Ecken (Radius 10)
-    rect(x, y, w, h, 10);
-
-    // Setzt die Textfarbe auf Weiß
-    fill(255);
-
-    // Zentriert den Text sowohl horizontal als auch vertikal
+    // Text auf dem Button
+    fill(255); // Textfarbe Weiß
     textAlign(CENTER, CENTER);
-
-    // Setzt die Schriftgröße auf 20 Pixel
     textSize(20);
-
-    // Zeichnet den Button-Text in der Mitte des Buttons
-    text(label, x + w / 2, y + h / 2);
+    text(label, x + w / 2, y + h / 2); // Text zentrieren
   }
 
   // Methode zur Überprüfung, ob der Button angeklickt wurde
