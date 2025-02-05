@@ -148,13 +148,13 @@ class Game {
     }
 
     if (level.hasBoss) {
-      for (Enemy e : enemies) {
-        if (e instanceof Boss) {
-          Boss boss = (Boss) e;
+      for (int i = enemies.size() - 1; i >= 0; i--) {
+        if (enemies.get(i) instanceof Boss) {
+          Boss boss = (Boss) enemies.get(i);
           boss.takeDamage();
           if (boss.isDead()) {
             player.score += 500;
-            enemies.remove(e);
+            enemies.remove(i);
             triggerTransition(5);
             break;
           }
@@ -177,15 +177,19 @@ class Game {
       e.display();
       if (frameCount % 30 == 0) e.shoot(enemyBullets);
       if (e.y > height) enemies.remove(i);
+    }
 
-      for (int k = playerBullets.size() - 1; k >= 0; k--) {
-        Bullet b = playerBullets.get(k);
-        b.update();
-        b.display();
-        if (dist(b.x, b.y, e.x, e.y) < e.size / 2) {
-          enemies.remove(i);
+    for (int i = playerBullets.size() - 1; i >= 0; i--) {
+      Bullet b = playerBullets.get(i);
+      b.update();
+      b.display();
+
+      for (int j = enemies.size() - 1; j >= 0; j--) {
+        Enemy e = enemies.get(j);
+        if (bulletHitsEnemy(b, e)) {
+          enemies.remove(j);
+          playerBullets.remove(i);
           player.score += 10;
-          playerBullets.remove(k);
           break;
         }
       }
@@ -203,6 +207,10 @@ class Game {
         }
       }
     }
+  }
+
+  boolean bulletHitsEnemy(Bullet bullet, Enemy enemy) {
+    return dist(bullet.x, bullet.y, enemy.x, enemy.y) < enemy.size / 2;
   }
 
   void drawLives(float x, float y, float width, int lives) {
@@ -228,19 +236,24 @@ class Game {
     text("Punkte: " + player.score, 145, 20);
     drawLives(100, 50, 22, player.lives);
   }
-}
 
 
-// Power-Up Timer für ein aktives Power-Up
-void drawPowerUpTimer(float x, float y, float barWidth, float barHeight, float timer, float maxTimer, color barColor) {
-  float timerProgress = timer / maxTimer; // Berechne den Fortschritt des Timers
 
-  // Timer-Balken (innerer farbiger Bereich)
-  fill(barColor);
-  rect(x, y, barWidth * timerProgress, barHeight, 6); // Timer-Balken nur mit fortschreitendem Wert
 
-  // Weiße Umrandung
-  stroke(255);
-  noFill();
-  rect(x, y, barWidth, barHeight, 6); // Weiße Umrandung
+  void drawPowerUpTimer(float x, float y, float barWidth, float barHeight, float timer, float maxTimer, color barColor) {
+    float timerProgress = timer / maxTimer;
+    fill(barColor);
+    rect(x, y, barWidth * timerProgress, barHeight, 6);
+    stroke(255);
+    noFill();
+    rect(x, y, barWidth, barHeight, 6);
+    // Timer-Balken (innerer farbiger Bereich)
+    fill(barColor);
+    rect(x, y, barWidth * timerProgress, barHeight, 6); // Timer-Balken nur mit fortschreitendem Wert
+
+    // Weiße Umrandung
+    stroke(255);
+    noFill();
+    rect(x, y, barWidth, barHeight, 6); // Weiße Umrandung
+  }
 }
