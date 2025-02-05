@@ -1,15 +1,19 @@
 // Definition der StartScreen-Klasse (Startbildschirm des Spiels)
 
 class StartScreen {
+  PImage StartImage;
   Star[] stars = new Star[150];  // Array für die Sterne im Hintergrund
   Button levelButton, helpButton;  // Buttons für die Level-Auswahl und Hilfe
   float alpha = 0;  // Transparenz für den Titeltext
   Game game;  // Referenz auf das Game-Objekt, um Übergänge zu verwalten
 
   // Konstruktor: Initialisiert den Startbildschirm und die Buttons
+
   StartScreen(Game game) {
     this.game = game;  // Speichert die Referenz auf das Game-Objekt
 
+    // Lade das Bild nur EINMAL
+    StartImage = loadImage("./data./StartScreen.png");
     // Erstelle die Sterne im Hintergrund
     for (int i = 0; i < stars.length; i++) {
       stars[i] = new Star();  // Jedes Sternobjekt wird in das Array eingefügt
@@ -22,26 +26,21 @@ class StartScreen {
 
   // Anzeige-Methode für den Startbildschirm
   void display() {
-    // Hintergrundanimation (Sterne bewegen sich)
     drawBackground();
-
-    // Titeltext mit Pulsieren
     drawTitle();
-
-    // Start-Text mit pulsierender Transparenz
     drawStartText();
-
-    // Anzeigen der Buttons
     levelButton.display();
     helpButton.display();
   }
 
   // Zeichnet den Hintergrund mit den bewegenden Sternen
   void drawBackground() {
-    background(0);  // Schwarzer Hintergrund
+    image(StartImage, 0, 0, width, height); // Hintergrundbild einmal zeichnen
+
+    // Zeichne Sterne über das Bild
     for (Star s : stars) {
-      s.update();  // Aktualisiert die Position der Sterne
-      s.show();    // Zeichnet die Sterne
+      s.update();
+      s.show();
     }
   }
 
