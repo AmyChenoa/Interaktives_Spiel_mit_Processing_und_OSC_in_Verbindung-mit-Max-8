@@ -4,9 +4,12 @@ class LevelScreen {
   Button backButton;
   Button[] levels = new Button[9];
   float alpha = 0;
+  PImage StartImage;
 
   LevelScreen(Game g) {
     this.game = g;
+
+    StartImage = loadImage("./data./Level.png");
 
     for (int i = 0; i < stars.length; i++) {
       stars[i] = new Star();
@@ -38,7 +41,7 @@ class LevelScreen {
   }
 
   void drawBackground() {
-    background(0);
+    image(StartImage, 0, 0, width, height); // Hintergrundbild einmal zeichnen
     for (Star s : stars) {
       s.update();
       s.show();

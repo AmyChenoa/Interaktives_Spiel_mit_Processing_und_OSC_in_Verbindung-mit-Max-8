@@ -1,5 +1,3 @@
-// Definition der StartScreen-Klasse (Startbildschirm des Spiels)
-
 class StartScreen {
   PImage StartImage;
   Star[] stars = new Star[150];  // Array für die Sterne im Hintergrund
@@ -8,20 +6,17 @@ class StartScreen {
   Game game;  // Referenz auf das Game-Objekt, um Übergänge zu verwalten
 
   // Konstruktor: Initialisiert den Startbildschirm und die Buttons
-
   StartScreen(Game game) {
-    this.game = game;  // Speichert die Referenz auf das Game-Objekt
+    this.game = game;
 
-    // Lade das Bild nur EINMAL
     StartImage = loadImage("./data./StartScreen.png");
-    // Erstelle die Sterne im Hintergrund
     for (int i = 0; i < stars.length; i++) {
-      stars[i] = new Star();  // Jedes Sternobjekt wird in das Array eingefügt
+      stars[i] = new Star();
     }
 
-    // Erstelle die Buttons für Level-Auswahl und Hilfe
-    levelButton = new Button(width / 2 - 250, height / 2 + 100, 200, 50, "LEVELS");
-    helpButton = new Button(width / 2 + 50, height / 2 + 100, 200, 50, "HELP");
+    // Buttons weiter nach links verschieben
+    levelButton = new Button(width / 2 - 420, height / 2 + 150, 200, 50, "LEVELS"); // Weiter nach links verschoben
+    helpButton = new Button(width / 2 - 20, height / 2 + 150, 200, 50, "HELP");  // Position des Hilfe-Buttons bleibt unverändert
   }
 
   // Anzeige-Methode für den Startbildschirm
@@ -46,51 +41,57 @@ class StartScreen {
 
   // Zeichnet den Titel des Spiels mit verschiedenen Effekten
   void drawTitle() {
-    textAlign(CENTER);  // Textzentrierung
-    textSize(80);  // Setzt die Schriftgröße für den Titel
+    textAlign(CENTER);
+    textSize(100);  // Noch größerer, fetterer Titel
+    alpha = 150 + 105 * sin(millis() * 0.005);
 
-    // Pulsierender Effekt für den Titel
-    alpha = 150 + 105 * sin(millis() * 0.005);  // Verwenden der Sinusfunktion für das Pulsieren
+    // Titel weiter nach oben
+    float titleY = height / 4;
 
-    // Titel mit mehreren Schatteneffekten (faded)
+    // Titel mit mehreren Schatteneffekten
     fill(0, 0, 0, alpha);
-    text("SPACE SHOOTER", width / 2 + 5, height / 3 + 5);
+    text("SPACE SHOOTER", width / 2 + 5, titleY + 5);
     fill(0, 0, 0, alpha - 50);
-    text("SPACE SHOOTER", width / 2 + 8, height / 3 + 8);
+    text("SPACE SHOOTER", width / 2 + 8, titleY + 8);
     fill(0, 0, 0, alpha - 100);
-    text("SPACE SHOOTER", width / 2 + 12, height / 3 + 12);
+    text("SPACE SHOOTER", width / 2 + 12, titleY + 12);
 
-    // Umrandung (Zweifache Umrandung mit verschiedenen Farben)
+    // Umrandung dicker
     fill(255, 0, 0);
     stroke(255, 0, 0);
-    strokeWeight(10);
-    text("SPACE SHOOTER", width / 2, height / 3);
+    strokeWeight(16);
+    text("SPACE SHOOTER", width / 2, titleY);
 
     fill(255, 255, 0);
     stroke(255, 255, 0);
-    strokeWeight(5);
-    text("SPACE SHOOTER", width / 2, height / 3);
+    strokeWeight(10);
+    text("SPACE SHOOTER", width / 2, titleY);
 
-    // Fetter, leuchtender Türkis Text
+    // Leuchtender Haupttext
     fill(0, 255, 255, alpha);
     noStroke();
-    text("SPACE SHOOTER", width / 2, height / 3);  // Haupttext ohne Rand
+    text("SPACE SHOOTER", width / 2, titleY);
   }
 
-  // Zeichnet den Start-Text (mit pulsierender Transparenz)
   void drawStartText() {
-    textSize(30);  // Kleinere Schrift für den Starttext
-    float startTextAlpha = 150 + 105 * sin(millis() * 0.005);  // Pulsierender Effekt für den Text
+    textSize(35);  // Größere Schriftgröße für mehr Sichtbarkeit
+    float startTextAlpha = 150 + 105 * sin(millis() * 0.005);
+
     fill(0, 0, 0, startTextAlpha);
-    text("Press ENTER to Start", width / 2 + 3, height / 2 + 3);  // Schatteneffekt
+    textAlign(CENTER);
+    
+    // Text fetter und nach rechts verschoben
+    strokeWeight(8);  // Text dicker machen
+    text("Press ENTER to Start", width / 2 + 100, height / 2 + 3);  // Weiter nach rechts verschoben
+
     fill(255, 0, 0, startTextAlpha);
     stroke(255, 0, 0);
-    strokeWeight(4);
-    text("Press ENTER to Start", width / 2, height / 2);  // Umrandung
+    strokeWeight(10);  // Fetterer Rand
+    text("Press ENTER to Start", width / 2 + 100, height / 2);
 
-    fill(255, 255, 255, startTextAlpha);  // Haupttext in Weiß
-    noStroke();
-    text("Press ENTER to Start", width / 2, height / 2);
+    fill(255, 255, 255, startTextAlpha);
+    strokeWeight(5);  // Dickerer weißer Text
+    text("Press ENTER to Start", width / 2 + 100, height / 2);
   }
 
   // Überprüft, ob einer der Buttons geklickt wurde

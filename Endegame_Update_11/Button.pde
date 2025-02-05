@@ -1,5 +1,3 @@
-// Definition der Klasse Button
-
 class Button {
   // Deklaration der Positions- und Größenvariablen
   float x, y, w, h;
@@ -27,6 +25,9 @@ class Button {
 
   // Methode zum Zeichnen des Buttons auf dem Bildschirm
   void display() {
+    // Entferne die Umrandung des Buttons
+    noStroke();
+
     // Setzt die Füllfarbe je nachdem, ob sich die Maus über dem Button befindet
     fill(mouseOver() ? color(0, 255, 150) : color(50));
 
