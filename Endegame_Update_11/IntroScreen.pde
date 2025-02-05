@@ -1,5 +1,4 @@
 // Definition der Klasse IntroScreen
-
 class IntroScreen {
   Star[] stars = new Star[150];  // Array von Sternen für den Hintergrund
   Game game;  // Referenz auf das Game-Objekt, um die Übergänge zu steuern

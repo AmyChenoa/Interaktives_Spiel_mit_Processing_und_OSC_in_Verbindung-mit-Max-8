@@ -1,5 +1,6 @@
+// Definition der Button-Klasse
 class Button {
-  // Deklaration der Positions- und Größenvariablen
+  // Deklaration der Positions- und Größenvariablen für den Button
   float x, y, w, h;
 
   // Text, der auf dem Button angezeigt wird
@@ -23,18 +24,19 @@ class Button {
     this.label = label;
   }
 
+  // Methode zur Darstellung des Buttons
   void display() {
     // Setze die weiße Umrandung für den Button
-    stroke(255); // Weiße Umrandung
-    strokeWeight(1); // Dünne Umrandung
-    fill(mouseOver() ? color(0, 255, 150) : color(50)); // Füllfarbe ändern
-    rect(x, y, w, h, 10); // Rechteck mit abgerundeten Ecken zeichnen
+    stroke(255); // Weiße Umrandung des Buttons
+    strokeWeight(1); // Dünne Umrandung des Buttons
+    fill(mouseOver() ? color(0, 255, 150) : color(50)); // Füllfarbe ändern, wenn die Maus über dem Button ist
+    rect(x, y, w, h, 10); // Zeichnet ein Rechteck mit abgerundeten Ecken für den Button
 
     // Text auf dem Button
     fill(255); // Textfarbe Weiß
-    textAlign(CENTER, CENTER);
-    textSize(20);
-    text(label, x + w / 2, y + h / 2); // Text zentrieren
+    textAlign(CENTER, CENTER); // Text wird sowohl horizontal als auch vertikal zentriert
+    textSize(20); // Schriftgröße für den Text auf dem Button
+    text(label, x + w / 2, y + h / 2); // Zeichnet den Text in der Mitte des Buttons
   }
 
   // Methode zur Überprüfung, ob der Button angeklickt wurde

@@ -1,5 +1,4 @@
 // Deklaration der Hauptklasse des Spiels als globale Variable
-
 Game game;
 
 void setup() {

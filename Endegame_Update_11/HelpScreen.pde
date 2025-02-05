@@ -1,5 +1,4 @@
 // Definition der Klasse HelpScreen
-
 class HelpScreen {
   Star[] stars = new Star[150];  // Array für Sterne im Hintergrund
   Button backButton;  // Zurück-Button, um zum vorherigen Bildschirm zu wechseln

@@ -1,5 +1,4 @@
 // Definition der Klasse Bullet (Projektil)
-
 class Bullet {
   // Deklaration der Positionsvariablen
   float x, y;
@@ -29,7 +28,7 @@ class Bullet {
     // Speichern der Farbe des Projektils
     this.c = c;
 
-    this.size = size;  // Hinzugefügte Variable für die Größe
+    this.size = size;  // Hinzugefügte Variable für die Größe des Projektils
   }
 
   // Methode zur Aktualisierung der Position des Projektils
@@ -46,7 +45,7 @@ class Bullet {
     // Setzt die Füllfarbe auf die gespeicherte Farbe des Projektils
     fill(c);
 
-    // Zeichnet das Projektil als Kreis mit einem Durchmesser von 10 Pixeln
-    ellipse(x, y, 10, 10);
+    // Zeichnet das Projektil als Kreis mit einem Durchmesser, der der Größe des Projektils entspricht
+    ellipse(x, y, size, size);
   }
 }

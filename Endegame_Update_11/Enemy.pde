@@ -1,5 +1,4 @@
-// Definition der Klasse Enemy
-
+// Definition der Enemy-Klasse (Gegner)
 class Enemy {
   // Position des Gegners
   float x, y;
@@ -9,8 +8,8 @@ class Enemy {
 
   // Konstruktor zur Initialisierung eines Gegners mit einer Startposition
   Enemy(float x, float y) {
-    this.x = x;
-    this.y = y;
+    this.x = x; // Initialisiert die X-Position
+    this.y = y; // Initialisiert die Y-Position
   }
 
   // Methode zur Aktualisierung der Position des Gegners (nach unten bewegen)
@@ -21,7 +20,7 @@ class Enemy {
   // Methode zum Zeichnen des Gegners
   void display() {
     fill(255, 100, 100); // Rote Farbe für den Gegner
-    ellipse(x, y, size, size); // Zeichnet einen Kreis als Gegner
+    ellipse(x, y, size, size); // Zeichnet den Gegner als Kreis
   }
 
   // Methode für das Schießen (ein einzelnes Projektil mit zufälliger horizontaler Abweichung)
@@ -29,6 +28,7 @@ class Enemy {
     // Erstellt ein neues Projektil mit zufälliger horizontaler Abweichung (-1 bis 1)
     float randomSize = random(5, 20); // Beispielgröße zwischen 5 und 20
 
+    // Fügt das Projektil der Liste hinzu
     bullets.add(new Bullet(x, y, random(-1, 1), 3, color(255, 0, 0), randomSize));
   }
 }
@@ -40,27 +40,28 @@ class Boss extends Enemy {
 
   // Konstruktor für den Boss mit zusätzlicher Lebenspunkte-Variable
   Boss(float x, float y, int health) {
-    super(x, y); // Ruft den Konstruktor der Enemy-Klasse auf
-    this.size = 60; // Größere Größe für den Boss
+    super(x, y); // Ruft den Konstruktor der Enemy-Klasse auf, um Position zu initialisieren
+    this.size = 60; // Größere Größe für den Boss (im Vergleich zu normalen Gegnern)
     this.health = health; // Setzt die übergebene Lebenspunktezahl
   }
 
   // Überschreibt die update-Methode für eine spezielle Bewegung
   @Override
-    void update() {
-    x += sin(frameCount * 0.05) * 5; // Seitliche Schwingbewegung mit Sinus
+  void update() {
+    // Seitliche Schwingbewegung des Bosses mit einer Sinusfunktion
+    x += sin(frameCount * 0.05) * 5; // Seitliche Bewegung mit Sinus
     y += 1; // Langsame Vertikalbewegung nach unten
   }
 
   @Override
-    void display() {
+  void display() {
     fill(0, 255, 0);  // Boss in grüner Farbe
-    ellipse(x, y, size, size);  // Zeichnet den Boss
+    ellipse(x, y, size, size);  // Zeichnet den Boss als Kreis
   }
 
   // Überschreibt die shoot-Methode für den Boss (schießt in mehreren Richtungen)
   @Override
-    void shoot(ArrayList<Bullet> bullets) {
+  void shoot(ArrayList<Bullet> bullets) {
     // Der Boss schießt in sechs Richtungen mit einem Winkelabstand von PI/6 (30°)
     for (float angle = 0; angle < TWO_PI; angle += PI / 6) {
       // Erstellt ein Projektil mit einer Geschwindigkeit von 3 in Richtung des Winkels
@@ -76,23 +77,23 @@ class Boss extends Enemy {
 
   // Überprüft, ob der Boss besiegt wurde (Lebenspunkte <= 0)
   boolean isDead() {
-    return health <= 0;
+    return health <= 0; // Gibt true zurück, wenn der Boss keine Lebenspunkte mehr hat
   }
 
   // Methode zur Anzeige der Lebenspunkte des Bosses als Fortschrittsbalken
   void displayHealth() {
-    // Hintergrund des Lebensbalkens
+    // Hintergrund des Lebensbalkens (grauer Balken)
     fill(50, 50, 50);
-    rect(width / 2 - 150, 20, 300, 20, 10); // Grauer Hintergrundbalken
+    rect(width / 2 - 150, 20, 300, 20, 10); // Zeichnet den grauen Hintergrund des Lebensbalkens
 
     // Berechnung der Breite des roten Gesundheitsbalkens basierend auf den Lebenspunkten
-    float healthBarWidth = map(health, 0, 50, 0, 300);
+    float healthBarWidth = map(health, 0, 50, 0, 300); // Skaliert die Breite je nach verbleibenden Lebenspunkten
 
     // Zeichnet den roten Gesundheitsbalken
     fill(255, 0, 0);
-    rect(width / 2 - 150, 20, healthBarWidth, 20, 10);
+    rect(width / 2 - 150, 20, healthBarWidth, 20, 10); // Zeichnet den roten Balken
 
-    // Textanzeige der aktuellen Lebenspunkte
+    // Textanzeige der aktuellen Lebenspunkte des Bosses
     fill(255); // Weiße Farbe für den Text
     textSize(20); // Schriftgröße auf 20 setzen
     text("Boss Health: " + health, width / 2 - 130, 15); // Zeigt die Lebenspunkte als Text an

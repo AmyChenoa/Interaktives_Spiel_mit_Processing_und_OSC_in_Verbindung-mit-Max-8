@@ -1,5 +1,4 @@
 // Definition der Klasse GameOverScreen
-
 class GameOverScreen {
   float alpha = 0;  // Variable für die Transparenz des Textes
   Star[] stars = new Star[150];  // Array für Sterne, die den Hintergrund bilden
