@@ -9,7 +9,7 @@ class LevelScreen {
   LevelScreen(Game g) {
     this.game = g;
 
-    StartImage = loadImage("./data./Level.png");
+    StartImage = loadImage("./data./LevelScreen.png");
 
     for (int i = 0; i < stars.length; i++) {
       stars[i] = new Star();
@@ -50,16 +50,18 @@ class LevelScreen {
 
   void drawTitle() {
     textAlign(CENTER);
-    textSize(80);
+    textSize(95);
     alpha = 150 + 105 * sin(millis() * 0.005);
 
-    fill(255, 0, 0);
-    stroke(255, 0, 0);
-    strokeWeight(10);
+    // Fettere Überschrift mit einer dünnen schwarzen Umrandung
+    fill(255, 255, 255, 180); // Hellerer Weißton
+    stroke(10); // Schwarze Umrandung
+    strokeWeight(5); // Dünne Umrandung
     text("CHOOSE A LEVEL", width / 2, height / 3);
 
+    // Leuchtender Titel
     fill(0, 255, 255, alpha);
-    noStroke();
+     stroke(10); // Schwarze Umrandung
     text("CHOOSE A LEVEL", width / 2, height / 3);
   }
 
