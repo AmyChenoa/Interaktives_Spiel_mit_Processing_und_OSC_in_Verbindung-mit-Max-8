@@ -52,6 +52,12 @@ class Boss extends Enemy {
     y += 1; // Langsame Vertikalbewegung nach unten
   }
 
+  @Override
+    void display() {
+    fill(0, 255, 0);  // Boss in grüner Farbe
+    ellipse(x, y, size, size);  // Zeichnet den Boss
+  }
+
   // Überschreibt die shoot-Methode für den Boss (schießt in mehreren Richtungen)
   @Override
     void shoot(ArrayList<Bullet> bullets) {

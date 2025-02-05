@@ -210,6 +210,7 @@ class Game {
 
       // Boss-Feinde speziell behandeln
       if (e instanceof Boss) {
+        enemies.add(new Boss(200, 50, 50));  // Füge einen Boss an Position (200, 50) hinzu
         Boss boss = (Boss) e;
         boss.takeDamage(); // Schaden an Boss zufügen
         if (boss.isDead()) {
