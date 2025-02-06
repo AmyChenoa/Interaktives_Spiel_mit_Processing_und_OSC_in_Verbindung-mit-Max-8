@@ -1,19 +1,20 @@
 // Definition der Klasse GameOverScreen
 class GameOverScreen {
-  float alpha = 0;  // Variable für die Transparenz des Textes
-  Star[] stars = new Star[150];  // Array für Sterne, die den Hintergrund bilden
+  float alpha = 0;  // Transparenz für den Titeltext  Star[] stars = new Star[150];  // Array für Sterne, die den Hintergrund bilden
   int highScore = 0;  // Highscore des Spiels
   int currentScore = 0; // Der aktuelle Score nach dem Spiel
   Game game;  // Referenz auf das Game-Objekt (wird aktuell nicht verwendet)
+  Star[] stars = new Star[150];  // Array für die Sterne im Hintergrund
 
   // Konstruktor: Initialisiert die Sterne und lädt den Highscore
-  GameOverScreen() {
-    // Initialisiert das Sterne-Array
+  GameOverScreen(Game game) {
+    this.game = game; // Initialisierung der game-Referenz
     for (int i = 0; i < stars.length; i++) {
-      stars[i] = new Star();  // Für jeden Stern ein neues Star-Objekt erzeugen
+      stars[i] = new Star();
     }
-    loadHighScore();  // Highscore aus der Datei laden
+    loadHighScore();
   }
+
 
   // Zeichnet den Hintergrund und lässt die Sterne bewegen
   void drawBackground() {
@@ -26,33 +27,27 @@ class GameOverScreen {
 
   // Zeigt den Game Over Screen an
   void display(int finalScore) {
-    currentScore = finalScore;  // Setzt den aktuellen Score
-
-    // Zeichnet den Hintergrund und die Sterne
+    currentScore = finalScore;
     drawBackground();
+    float dynamicAlpha = 150 + 105 * sin(millis() * 0.005); // Einmal berechnen
 
-    // Zeichnet die verschiedenen Texte auf dem Bildschirm
-    drawGameOverText();
-    drawScoreBox();
-    drawHighScoreText();
-    drawRestartText();
+    drawGameOverText(dynamicAlpha);
+    drawScoreBox(dynamicAlpha);
+    drawHighScoreText(dynamicAlpha);
+    drawRestartText(dynamicAlpha);
 
-    // Wenn der aktuelle Score höher als der Highscore ist, wird der Highscore aktualisiert
     if (currentScore > highScore) {
       highScore = currentScore;
-      saveHighScore();  // Speichert den neuen Highscore in der Datei
+      saveHighScore();
     }
   }
 
+
   // Zeichnet den "GAME OVER"-Text mit verschiedenen Effekten
-  void drawGameOverText() {
-    textAlign(CENTER);  // Text zentriert ausrichten
-    textSize(80);  // Setzt die Textgröße
+  void drawGameOverText(float alpha) {
+    textAlign(CENTER);
+    textSize(80);
 
-    // Berechnet eine dynamische Transparenz basierend auf der Zeit
-    alpha = 150 + 105 * sin(millis() * 0.005);  // Sinusfunktion für Pulsieren
-
-    // Zeichnet mehrere Schatteneffekte für den Text
     fill(0, 0, 0, alpha);
     text("GAME OVER", width / 2 + 5, height / 3 + 5);
     fill(0, 0, 0, alpha - 50);
@@ -60,39 +55,36 @@ class GameOverScreen {
     fill(0, 0, 0, alpha - 100);
     text("GAME OVER", width / 2 + 12, height / 3 + 12);
 
-    // Zeichnet den Haupttext in Rot und Gelb mit verschiedenen Effekten
-    fill(255, 0, 0);  // Rote Farbe
-    stroke(255, 0, 0);  // Rote Umrandung
-    strokeWeight(10);  // Dicke der Umrandung
+    fill(255, 0, 0);
+    stroke(255, 0, 0);
+    strokeWeight(10);
     text("GAME OVER", width / 2, height / 3);
 
-    fill(255, 255, 0);  // Gelbe Farbe
-    stroke(255, 255, 0);  // Gelbe Umrandung
+    fill(255, 255, 0);
+    stroke(255, 255, 0);
     strokeWeight(5);
     text("GAME OVER", width / 2, height / 3);
 
-    fill(0, 255, 255, alpha);  // Cyan Farbe für die letzte Textschicht
+    fill(0, 255, 255, alpha);
     noStroke();
     text("GAME OVER", width / 2, height / 3);
   }
 
-  // Zeichnet das Score-Box für den aktuellen Score
-  void drawScoreBox() {
-    // Transparentes Rechteck für den Score
-    fill(0, 0, 0, 150);  // Halbtransparentes Schwarz
-    noStroke();  // Keine Umrandung für das Rechteck
-    rectMode(CENTER);  // Setzt den Ursprung des Rechtecks auf die Mitte
-    rect(width / 2, height / 2, 300, 70);  // Rechteck für den Score
 
-    // Score Text mit pulsierender Transparenz
-    textSize(30);  // Textgröße
-    float scoreTextAlpha = 150 + 105 * sin(millis() * 0.005);  // Berechnet die pulsierende Transparenz
-    fill(255, 0, 0, scoreTextAlpha);  // Rote Farbe für den Text
-    text("Score: " + currentScore, width / 2, height / 2);  // Zeigt den aktuellen Score an
+  // Zeichnet das Score-Box für den aktuellen Score
+  void drawScoreBox(float alpha) {
+    rectMode(CENTER);
+    fill(0, 0, 0, 150);
+    noStroke();
+    rect(width / 2, height / 2, 300, 70);
+
+    textSize(30);
+    fill(255, 0, 0, alpha);
+    text("Score: " + currentScore, width / 2, height / 2);
   }
 
   // Zeichnet den Text für den Highscore
-  void drawHighScoreText() {
+  void drawHighScoreText(float alpha) {
     textSize(30);  // Textgröße
     float highScoreTextAlpha = 150 + 105 * sin(millis() * 0.005);  // Berechnet die pulsierende Transparenz
     fill(0, 0, 0, highScoreTextAlpha);  // Schatten des Textes
@@ -108,7 +100,7 @@ class GameOverScreen {
   }
 
   // Zeichnet den Text für den Restart-Hinweis
-  void drawRestartText() {
+  void drawRestartText(float alpha) {
     textSize(30);  // Textgröße
     float restartTextAlpha = 150 + 105 * sin(millis() * 0.005);  // Berechnet die pulsierende Transparenz
     fill(0, 0, 0, restartTextAlpha);  // Schatten des Textes
@@ -125,11 +117,18 @@ class GameOverScreen {
 
   // Lädt den Highscore aus einer Datei
   void loadHighScore() {
-    String[] data = loadStrings("highscore.txt");  // Versucht, die Highscore-Datei zu laden
-    if (data != null && data.length > 0) {
-      highScore = Integer.parseInt(data[0]);  // Falls Daten vorhanden sind, Highscore setzen
+    try {
+      String[] data = loadStrings("highscore.txt");
+      if (data != null && data.length > 0) {
+        highScore = Integer.parseInt(data[0].trim());
+      }
+    }
+    catch (Exception e) {
+      println("Fehler beim Laden des Highscores: " + e.getMessage());
+      highScore = 0; // Standardwert setzen
     }
   }
+
 
   // Speichert den Highscore in einer Datei
   void saveHighScore() {
@@ -147,8 +146,9 @@ class GameOverScreen {
 
   // Überprüft, ob die ENTER-Taste gedrückt wurde, um das Spiel zurückzusetzen
   void keyPressed() {
-    if (key == ENTER) {
-      resetGame();  // Setzt das Spiel zurück
+    if (keyCode == ENTER) {
+      resetGame();
+      game.triggerTransition(1);
     }
   }
 }
