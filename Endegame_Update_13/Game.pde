@@ -24,13 +24,11 @@ class Game {
   float levelTime = 30;  // 30 Sekunden für jedes Level (beispiel)
   float timeRemaining;
   boolean levelCompleted = false;
-  // Neue Variable, um den Spielbeginn zu verfolgen
-  boolean gameStarted = false;
+  boolean gameStarted = false; // Der Timer wird erst nach Spielstart angezeigt
 
   // Fortschrittsbalken für den Level-Timer
   float levelTimeBarWidth = 500;
   float levelTimeBarHeight = 20;
-
 
   Game() {
     enemies = new ArrayList<>();
@@ -45,7 +43,6 @@ class Game {
     winScreen = new WinScreen(this);
     introScreen = new IntroScreen(this);
     player = new Player();
-
     level = new Level(1); // Anfangslevel
   }
 
@@ -54,7 +51,7 @@ class Game {
     backgroundImage.resize(width, height);
     resetGame();
     frameRate(60);
-    timeRemaining = levelTime;  // Timer für jedes Level setzen
+    timeRemaining = levelTime;
   }
 
   void draw() {
@@ -64,10 +61,41 @@ class Game {
       renderScreen();
     }
 
-    if (!levelCompleted) {
-      drawTimerBar(); // Zeigt den Timer-Balken an
+    // Timer-Balken wird nur angezeigt, wenn das Level läuft
+    if (gameStarted && !levelCompleted) {
+      drawLevelTimerBar(20, 10, levelTimeBarWidth, levelTimeBarHeight);
     }
   }
+
+  void drawLevelTimerBar(float x, float y, float width, float height) {
+    if (!gameStarted) return; // Der Timer wird nur angezeigt, wenn das Spiel gestartet wurde
+
+    // Hintergrund des Balkens mit Farbverlauf von grün nach rot
+    color c1 = color(0, 255, 0); // Grün
+    color c2 = color(255, 0, 0); // Rot
+    for (float i = 0; i < width; i++) {
+      float inter = map(i, 0, width, 0, 1);
+      color interColor = lerpColor(c1, c2, inter);
+      stroke(interColor);
+      line(x + i, y, x + i, y + height);
+    }
+
+    // Fortschrittsbalken (gelb) für den verbleibenden Timer
+    float progressWidth = map(timeRemaining, 0, levelTime, width, 0);
+    fill(255, 204, 0, 180); // Weichere gelbe Farbe mit Transparenz
+    noStroke();
+    rect(x, y, progressWidth, height, 10); // Abgerundete Ecken für den Balken
+
+    // Umrandung des Balkens
+    stroke(255);
+    noFill();
+    rect(x, y, width, height, 10);
+  }
+
+  void startGame() {
+    gameStarted = true; // Timer wird erst nach Spielstart sichtbar
+  }
+
 
   void triggerTransition(int newScreen) {
     nextScreen = newScreen;  // Set the next screen
@@ -154,28 +182,40 @@ class Game {
     enemyBullets.clear();
     powerUps.clear();
     platforms.clear();
-    levelCompleted = false;  // Set level as not completed
+    levelCompleted = false;
     screen = 0;
-    timeRemaining = levelTime;  // Reset timer
-    gameStarted = false;  // Reset game started flag
+    timeRemaining = levelTime;
+    gameStarted = false;
   }
+
   void playGame() {
     image(backgroundImage, 0, 0);
     player.update();
     player.display();
     drawHUD();
 
-    // Only show the level timer bar if the game has started
-    if (gameStarted) {
+    // Timer-Balken nur anzeigen, wenn das Level läuft
+    if (gameStarted && !levelCompleted) {
       drawLevelTimerBar(20, 10, levelTimeBarWidth, levelTimeBarHeight);
     }
 
-    // Spawn enemies at intervals based on the level's spawn rate
+    // Spawne Gegner und handle Gameplay
     if (frameCount % level.spawnRate == 0) {
       for (int i = 0; i < level.enemyCount; i++) {
         enemies.add(new Enemy(random(30, width - 30), random(20, 100)));
       }
     }
+
+    // Timer Countdown
+    if (!levelCompleted) {
+      timeRemaining -= 1.0 / frameRate;
+      if (timeRemaining <= 0) {
+        levelCompleted = true;
+        triggerTransition(5); // Zum Win-Screen wechseln
+      }
+    }
+
+
 
     // If the level has a boss, handle boss logic
     if (level.hasBoss) {
@@ -256,29 +296,6 @@ class Game {
       }
     }
   }
-  void startGame() {
-    gameStarted = true;  // Set the flag to true when the game starts
-  }
-
-  // Funktion, um den Timer-Balken schön anzuzeigen
-  void drawLevelTimerBar(float x, float y, float width, float height) {
-    // Farbverlauf von grün (für viel Zeit) zu rot (für wenig Zeit)
-    color c1 = color(0, 255, 0); // grün
-    color c2 = color(255, 0, 0); // rot
-    for (float i = 0; i < width; i++) {
-      float inter = map(i, 0, width, 0, 1);
-      color interColor = lerpColor(c1, c2, inter);
-      stroke(interColor);
-      line(x + i, y, x + i, y + height);  // Vertikale Linien für Farbverlauf
-    }
-
-    // Fortschrittsbalken (gelb) für den verbleibenden Timer
-    float progressWidth = map(timeRemaining, 0, levelTime, width, 0);  // Berechne den Fortschritt
-    fill(255, 255, 0);  // Gelbe Farbe für den Fortschritt
-    noStroke();
-    rect(x, y, progressWidth, height, 10);  // Abgerundete Ecken für den Balken
-  }
-
 
   void drawTimerBar() {
     float barWidth = width;
