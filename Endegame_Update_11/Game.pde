@@ -31,7 +31,7 @@ class Game {
     startScreen = new StartScreen(this);
     levelScreen = new LevelScreen(this);
     helpScreen = new HelpScreen(this);
-    gameOverScreen = new GameOverScreen();
+    gameOverScreen = new GameOverScreen(this);
     winScreen = new WinScreen(this);
     introScreen = new IntroScreen(this);
 
@@ -221,25 +221,25 @@ class Game {
     text("Score: " + player.score, 20, 40);  // Zeigt den Punktestand des Spielers an
     text("Lives: " + player.lives, width - 150, 40);  // Zeigt die verbleibenden Leben des Spielers an
   }
-}
 
 
 
 
-void drawPowerUpTimer(float x, float y, float barWidth, float barHeight, float timer, float maxTimer, color barColor) {
-  float timerProgress = timer / maxTimer;
-  fill(barColor);
-  rect(x, y, barWidth * timerProgress, barHeight, 6);
-  stroke(255);
-  noFill();
-  rect(x, y, barWidth, barHeight, 6);
-  // Timer-Balken (innerer farbiger Bereich)
-  fill(barColor);
-  rect(x, y, barWidth * timerProgress, barHeight, 6); // Timer-Balken nur mit fortschreitendem Wert
 
-  // Weiße Umrandung
-  stroke(255);
-  noFill();
-  rect(x, y, barWidth, barHeight, 6); // Weiße Umrandung
-}
+  void drawPowerUpTimer(float x, float y, float barWidth, float barHeight, float timer, float maxTimer, color barColor) {
+    float timerProgress = timer / maxTimer;
+    fill(barColor);
+    rect(x, y, barWidth * timerProgress, barHeight, 6);
+    stroke(255);
+    noFill();
+    rect(x, y, barWidth, barHeight, 6);
+    // Timer-Balken (innerer farbiger Bereich)
+    fill(barColor);
+    rect(x, y, barWidth * timerProgress, barHeight, 6); // Timer-Balken nur mit fortschreitendem Wert
+
+    // Weiße Umrandung
+    stroke(255);
+    noFill();
+    rect(x, y, barWidth, barHeight, 6); // Weiße Umrandung
+  }
 }
