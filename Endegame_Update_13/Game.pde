@@ -26,11 +26,11 @@ class Game {
   boolean levelCompleted = false;
   boolean gameStarted = false;
 
-  // Fortschrittsbalken für den Level-Timer
+  // Fortschrittsbalken
   float levelTimeBarWidth = 500;
   float levelTimeBarHeight = 20;
-  float levelTimeBarX = 300;  // Verschiebung nach rechts
-  float levelTimeBarY = 15;   // Leicht nach unten
+  float levelTimeBarX = 300;
+  float levelTimeBarY = 15;
 
   Game() {
     enemies = new ArrayList<>();
@@ -73,28 +73,23 @@ class Game {
 
     float progressWidth = map(timeRemaining, 0, levelTime, width, 0);
 
-    // Hintergrund des Balkens (dezent grau)
-    fill(50, 50, 50, 180);
+    // Heller Hintergrund für den Timer-Balken
+    fill(200, 200, 200, 100);
     noStroke();
     rect(x, y, width, height, 10);
 
-    // Farbverlauf von grün nach rot
+    // Heller Farbverlauf von Grün nach Rot
     for (float i = 0; i < width; i++) {
       float inter = map(i, 0, width, 0, 1);
-      color interColor = lerpColor(color(0, 255, 0), color(255, 0, 0), inter);
+      color interColor = lerpColor(color(144, 238, 144), color(255, 182, 193), inter); // Hellgrün nach Rosa
       stroke(interColor);
       line(x + i, y, x + i, y + height);
     }
 
-    // Fortschrittsbalken (deutlich erkennbar)
-    fill(255, 204, 0, 220);
+    // Fortschrittsbalken (helles Gelb)
+    fill(255, 255, 102, 180);
     noStroke();
     rect(x, y, progressWidth, height, 10);
-
-    // Verbesserte Umrandung (dunkler statt weiß)
-    stroke(0);
-    noFill();
-    rect(x, y, width, height, 10);
   }
 
   void startGame() {
