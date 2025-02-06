@@ -163,8 +163,22 @@ class Game {
     }
   }
 
-  void playGame() {
-    image(backgroundImage, 0, 0);
+
+ void switchLevel(int newLevelNumber) {
+    level = new Level(newLevelNumber);  // Neues Level wird erstellt
+    println("Wechsel zu Level: " + newLevelNumber);  // Debugging
+}
+
+ void playGame() {
+    if (level != null && level.background != null) {
+        image(level.background, 0, 0);  // Hintergrundbild des aktuellen Levels
+    } else {
+        println("Fehler: Kein Hintergrundbild für das Level vorhanden!");
+    }
+
+
+
+    // Spiel-Elemente wie der Spieler, Feinde, Power-Ups etc. werden dann hier gezeichnet
     player.update();
     player.display();
     drawHUD();
@@ -182,10 +196,15 @@ class Game {
       timeRemaining -= 1.0 / frameRate;
       if (timeRemaining <= 0) {
         levelCompleted = true;
-        triggerTransition(5);
+        if (level.levelNumber < 9) {
+          switchLevel(level.levelNumber + 1);  // Nächstes Level
+        } else {
+          triggerTransition(5);  // Letztes Level abgeschlossen, daher Win-Bildschirm
+        }
       }
     }
 
+    // Feinde und Power-Ups aktualisieren
     for (int i = powerUps.size() - 1; i >= 0; i--) {
       PowerUp p = powerUps.get(i);
       p.display();

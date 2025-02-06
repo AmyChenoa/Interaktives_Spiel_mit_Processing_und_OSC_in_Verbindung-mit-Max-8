@@ -12,9 +12,15 @@ class Level {
     this.powerUps = new ArrayList<>();
     this.platforms = new ArrayList<>();
 
-    // Hintergrundbild basierend auf Levelnummer laden
-    this.background = loadImage("./data./background" + levelNumber + ".png");
-    this.background.resize(width, height);
+    String backgroundPath = "./data./background" + levelNumber + ".png";
+    background = loadImage(backgroundPath);
+
+    if (background != null) {
+      println("Hintergrund für Level " + levelNumber + " geladen: " + backgroundPath);
+    } else {
+      println("Fehler: Hintergrundbild für Level " + levelNumber + " konnte nicht geladen werden!");
+    }
+
 
     switch (levelNumber) {
     case 1:
