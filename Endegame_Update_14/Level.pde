@@ -9,13 +9,14 @@ class Level {
 
   Level(int levelNumber) {
     this.levelNumber = levelNumber;
-    this.powerUps = new ArrayList<>();
-    this.platforms = new ArrayList<>();
+    powerUps = new ArrayList<>();
+    platforms = new ArrayList<>();
+    // Set the number of enemies and spawn rate based on the level
+    setLevelAttributes();
+  }
 
-    // Hintergrundbild basierend auf Levelnummer laden
-    this.background = loadImage("./data./background" + levelNumber + ".png");
-    this.background.resize(width, height);
-
+  void setLevelAttributes() {
+    // Define the attributes based on the level
     switch (levelNumber) {
     case 1:
       enemyCount = 1;
@@ -92,6 +93,11 @@ class Level {
       hasBoss = false;
       break;
     }
+  }
+
+  // Method to return the current level number
+  int getLevelNumber() {
+    return levelNumber;
   }
 
   void initializeLevel(Game game) {
