@@ -20,6 +20,11 @@ class Game {
   boolean isTransitioning = false;
   int nextScreen = 0;
 
+  // Timer-Variablen
+  float levelTime = 30;  // 30 Sekunden für jedes Level (beispiel)
+  float timeRemaining;
+  boolean levelCompleted = false;
+
   Game() {
     enemies = new ArrayList<>();
     playerBullets = new ArrayList<>();
@@ -42,6 +47,7 @@ class Game {
     backgroundImage.resize(width, height);
     resetGame();
     frameRate(60);
+    timeRemaining = levelTime;  // Timer für jedes Level setzen
   }
 
   void draw() {
@@ -49,6 +55,10 @@ class Game {
       renderTransition();
     } else {
       renderScreen();
+    }
+
+    if (!levelCompleted) {
+      drawTimerBar(); // Zeigt den Timer-Balken an
     }
   }
 
@@ -133,7 +143,10 @@ class Game {
     playerBullets.clear();
     enemyBullets.clear();
     powerUps.clear();
+    platforms.clear();
+    levelCompleted = false;  // Setzt das Level als nicht abgeschlossen
     screen = 0;
+    timeRemaining = levelTime;  // Timer zurücksetzen
   }
 
   void playGame() {
@@ -142,14 +155,14 @@ class Game {
     player.display();
     drawHUD();
 
-    // Feinde spawnen
+    // Spawn enemies at intervals based on the level's spawn rate
     if (frameCount % level.spawnRate == 0) {
       for (int i = 0; i < level.enemyCount; i++) {
         enemies.add(new Enemy(random(30, width - 30), random(20, 100)));
       }
     }
 
-    // Bosskampf
+    // If the level has a boss, handle boss logic
     if (level.hasBoss) {
       for (int i = enemies.size() - 1; i >= 0; i--) {
         if (enemies.get(i) instanceof Boss) {
@@ -158,14 +171,16 @@ class Game {
           if (boss.isDead()) {
             player.score += 500;
             enemies.remove(i);
-            checkLevelWin();  // Überprüfen, ob das Level gewonnen wurde
+            // Check for level win after defeating the boss
+            levelCompleted = true;  // Mark the level as completed
+            triggerTransition(5);  // Transition to win screen
             break;
           }
         }
       }
     }
 
-    // PowerUps sammeln
+    // Handle power-ups
     for (int i = powerUps.size() - 1; i >= 0; i--) {
       PowerUp p = powerUps.get(i);
       p.display();
@@ -175,7 +190,7 @@ class Game {
       }
     }
 
-    // Feinde aktualisieren und überprüfen
+    // Handle enemies movement and shooting
     for (int i = enemies.size() - 1; i >= 0; i--) {
       Enemy e = enemies.get(i);
       e.update();
@@ -184,12 +199,13 @@ class Game {
       if (e.y > height) enemies.remove(i);
     }
 
-    // Spieler-Bullets gegen Feinde
+    // Handle player bullets
     for (int i = playerBullets.size() - 1; i >= 0; i--) {
       Bullet b = playerBullets.get(i);
       b.update();
       b.display();
 
+      // Check for collisions between player bullets and enemies
       for (int j = enemies.size() - 1; j >= 0; j--) {
         Enemy e = enemies.get(j);
         if (bulletHitsEnemy(b, e)) {
@@ -201,7 +217,7 @@ class Game {
       }
     }
 
-    // Feind-Bullets gegen Spieler
+    // Handle enemy bullets and check for collisions with the player
     for (int i = enemyBullets.size() - 1; i >= 0; i--) {
       Bullet b = enemyBullets.get(i);
       b.update();
@@ -210,17 +226,37 @@ class Game {
         player.lives--;
         enemyBullets.remove(i);
         if (player.lives <= 0) {
-          triggerTransition(4);  // Game Over
+          triggerTransition(4);  // Game over if player runs out of lives
         }
+      }
+    }
+
+    // Timer countdown logic
+    if (!levelCompleted) {
+      timeRemaining -= 1.0 / frameRate;  // Decrease the time remaining based on frame rate
+      if (timeRemaining <= 0) {
+        // Level is completed if time runs out
+        levelCompleted = true;
+        triggerTransition(5);  // Transition to win screen
       }
     }
   }
 
-  // Methode zur Überprüfung, ob das Level gewonnen wurde
-  void checkLevelWin() {
-    if (enemies.isEmpty()) {  // Alle Feinde und der Boss sind besiegt
-      triggerTransition(5);  // Wechsle zum Gewinnbildschirm
-    }
+
+  void drawTimerBar() {
+    float barWidth = width;
+    float barHeight = 10;
+    float timerProgress = timeRemaining / levelTime;
+
+    // Balken zeichnen
+    fill(255, 0, 0);
+    noStroke();
+    rect(0, 0, barWidth * timerProgress, barHeight);
+
+    // Optional: Umrandung des Balkens
+    stroke(255);
+    noFill();
+    rect(0, 0, barWidth, barHeight);
   }
 
   boolean bulletHitsEnemy(Bullet bullet, Enemy enemy) {
@@ -250,6 +286,8 @@ class Game {
     text("Punkte: " + player.score, 145, 20);
     drawLives(100, 50, 22, player.lives);
   }
+
+
 
   void drawPowerUpTimer(float x, float y, float barWidth, float barHeight, float timer, float maxTimer, color barColor) {
     float timerProgress = timer / maxTimer;
