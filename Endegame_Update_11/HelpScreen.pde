@@ -1,103 +1,82 @@
-// Definition der Klasse HelpScreen
 class HelpScreen {
-  Star[] stars = new Star[150];  // Array für Sterne im Hintergrund
-  Button backButton;  // Zurück-Button, um zum vorherigen Bildschirm zu wechseln
-  float alpha = 0;  // Variable für die pulsierende Transparenz der Texte
-  Game game;  // Referenz auf das Game-Objekt, um den Bildschirm zu wechseln
+  Star[] stars = new Star[150];
+  Button backButton;
+  float alpha = 0;
+  Game game;
+  PImage HelpImage;
 
-  // Konstruktor: Initialisiert die Sterne im Hintergrund und den Zurück-Button
+  // Setup-Methode, um Bilder zu laden und UI zu initialisieren
   HelpScreen(Game game) {
-    this.game = game;  // Referenz auf das Game-Objekt speichern, um den Bildschirm zu wechseln
+    this.game = game;
 
-    // Initialisiert die Sterne im Hintergrund
+
+    HelpImage = loadImage("./data./HelpScreen.png");
+
     for (int i = 0; i < stars.length; i++) {
-      stars[i] = new Star();  // Erstellt 150 Sterne für den Hintergrund
+      stars[i] = new Star();
     }
 
-    // Erstellt den Zurück-Button
-    backButton = new Button(width / 2 - 100, height - 100, 200, 50, "BACK");  // Button für den Zurück-Button
+    backButton = new Button(width / 2 - 100, height - 100, 200, 50, "BACK");
   }
 
-  // Zeigt den Hilfe-Bildschirm an
   void display() {
-    // Hintergrundanimation (Sterne bewegen sich)
     drawBackground();
-
-    // Titeltext mit pulsierendem Effekt
     drawTitle();
-
-    // Hilfe-Text mit pulsierender Transparenz
     drawHelpText();
-
-    // Button anzeigen
-    backButton.display();  // Zeigt den Zurück-Button an
+    backButton.display();
   }
 
-  // Zeichnet den Hintergrund mit bewegenden Sternen
   void drawBackground() {
-    background(0);  // Setzt den Hintergrund auf schwarz
+    image(HelpImage, 0, 0, width, height);
     for (Star s : stars) {
-      s.update();  // Aktualisiert die Position jedes Sterns
-      s.show();    // Zeigt den Stern an
+      s.update();
+      s.show();
     }
   }
 
-  // Zeichnet den Titeltext "HOW TO PLAY" mit pulsierenden Effekten
   void drawTitle() {
-    textAlign(CENTER);  // Zentriert den Text
-    textSize(80);  // Setzt die Textgröße auf 80 für den Titel
+    textAlign(CENTER);
+    textSize(80);
+    alpha = 150 + 105 * sin(millis() * 0.005);
 
-    // Pulsierender Effekt für den Titel
-    alpha = 150 + 105 * sin(millis() * 0.005);  // Sinusfunktion für pulsierende Transparenz
-
-    // Mehrere Schatteneffekte für den Titel
     fill(0, 0, 0, alpha);
-    text("HOW TO PLAY", width / 2 + 5, height / 3 + 5);  // Schatten 1
-    fill(0, 0, 0, alpha - 50);
-    text("HOW TO PLAY", width / 2 + 8, height / 3 + 8);  // Schatten 2
-    fill(0, 0, 0, alpha - 100);
-    text("HOW TO PLAY", width / 2 + 12, height / 3 + 12);  // Schatten 3
+    text("HOW TO PLAY", width / 2 + 5, height / 3 + 5);
 
-    // Umrandung des Textes
-    fill(255, 0, 0);  // Rote Farbe
-    stroke(255, 0, 0);  // Rote Umrandung
-    strokeWeight(10);  // Dicke der Umrandung
-    text("HOW TO PLAY", width / 2, height / 3);  // Text mit roter Umrandung
+    fill(255, 0, 0);
+    stroke(255, 0, 0);
+    strokeWeight(10);
+    text("HOW TO PLAY", width / 2, height / 3);
 
-    fill(255, 255, 0);  // Gelbe Farbe für die Umrandung
-    stroke(255, 255, 0);  // Gelbe Umrandung
-    strokeWeight(5);  // Dünnere Umrandung
-    text("HOW TO PLAY", width / 2, height / 3);  // Text mit gelber Umrandung
+    fill(255, 255, 0);
+    stroke(255, 255, 0);
+    strokeWeight(5);
+    text("HOW TO PLAY", width / 2, height / 3);
 
-    // Fetter, leuchtender türkiser Text ohne Umrandung
-    fill(0, 255, 255, alpha);  // Türkis mit pulsierender Transparenz
-    noStroke();  // Keine Umrandung
-    text("HOW TO PLAY", width / 2, height / 3);  // Endgültiger Text
+    fill(0, 255, 255, alpha);
+    noStroke();
+    text("HOW TO PLAY", width / 2, height / 3);
   }
 
-  // Zeichnet den Hilfetext mit Anweisungen
   void drawHelpText() {
-    textSize(20);  // Kleinere Schrift für die Hilfestellung
-    float helpTextAlpha = 150 + 105 * sin(millis() * 0.005);  // Pulsierender Effekt für den Hilfetext
+    textSize(20);
+    float helpTextAlpha = 150 + 105 * sin(millis() * 0.005);
 
-    // Hilfetext mit mehreren Effekten (Schatten, Umrandung und Text)
     fill(0, 0, 0, helpTextAlpha);
-    text("Move with Arrow Keys\nShoot with SPACE\nSurvive and destroy enemies!", width / 2 + 3, height / 2 + 3);  // Schatten
+    text("Move with Arrow Keys\nShoot with SPACE\nSurvive and destroy enemies!", width / 2 + 3, height / 2 + 3);
 
     fill(255, 0, 0, helpTextAlpha);
-    stroke(255, 0, 0);  // Rote Umrandung
+    stroke(255, 0, 0);
     strokeWeight(4);
-    text("Move with Arrow Keys\nShoot with SPACE\nSurvive and destroy enemies!", width / 2, height / 2);  // Text mit roter Umrandung
+    text("Move with Arrow Keys\nShoot with SPACE\nSurvive and destroy enemies!", width / 2, height / 2);
 
     fill(255, 255, 255, helpTextAlpha);
-    noStroke();  // Keine Umrandung
-    text("Move with Arrow Keys\nShoot with SPACE\nSurvive and destroy enemies!", width / 2, height / 2);  // Haupttext ohne Umrandung
+    noStroke();
+    text("Move with Arrow Keys\nShoot with SPACE\nSurvive and destroy enemies!", width / 2, height / 2);
   }
 
-  // Überprüft, ob der Zurück-Button geklickt wurde
   void mousePressed() {
-    if (backButton.isClicked()) {
-      game.triggerTransition(0);  // Wechselt zum Hauptbildschirm (Index 0)
+    if (backButton != null && backButton.isClicked()) {
+      game.triggerTransition(0);
     }
   }
 }
