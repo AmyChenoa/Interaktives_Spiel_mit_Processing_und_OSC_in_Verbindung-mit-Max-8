@@ -5,6 +5,7 @@ class Game {
   ArrayList<Bullet> playerBullets;
   ArrayList<Bullet> enemyBullets;
   ArrayList<PowerUp> powerUps;
+  ArrayList<Platform> platforms;
 
   Player player;
   StartScreen startScreen;
@@ -24,7 +25,7 @@ class Game {
     playerBullets = new ArrayList<>();
     enemyBullets = new ArrayList<>();
     powerUps = new ArrayList<>();
-
+    platforms = new ArrayList<>();
     startScreen = new StartScreen(this);
     levelScreen = new LevelScreen(this);
     helpScreen = new HelpScreen(this);
@@ -33,7 +34,7 @@ class Game {
     introScreen = new IntroScreen(this);
     player = new Player();
 
-    level = new Level(1, 6, 90, false); // Anfangslevel
+    level = new Level(1); // Anfangslevel
   }
 
   void setup() {
@@ -141,12 +142,14 @@ class Game {
     player.display();
     drawHUD();
 
+    // Feinde spawnen
     if (frameCount % level.spawnRate == 0) {
       for (int i = 0; i < level.enemyCount; i++) {
         enemies.add(new Enemy(random(30, width - 30), random(20, 100)));
       }
     }
 
+    // Bosskampf
     if (level.hasBoss) {
       for (int i = enemies.size() - 1; i >= 0; i--) {
         if (enemies.get(i) instanceof Boss) {
@@ -155,13 +158,14 @@ class Game {
           if (boss.isDead()) {
             player.score += 500;
             enemies.remove(i);
-            triggerTransition(5);
+            checkLevelWin();  // Überprüfen, ob das Level gewonnen wurde
             break;
           }
         }
       }
     }
 
+    // PowerUps sammeln
     for (int i = powerUps.size() - 1; i >= 0; i--) {
       PowerUp p = powerUps.get(i);
       p.display();
@@ -171,6 +175,7 @@ class Game {
       }
     }
 
+    // Feinde aktualisieren und überprüfen
     for (int i = enemies.size() - 1; i >= 0; i--) {
       Enemy e = enemies.get(i);
       e.update();
@@ -179,6 +184,7 @@ class Game {
       if (e.y > height) enemies.remove(i);
     }
 
+    // Spieler-Bullets gegen Feinde
     for (int i = playerBullets.size() - 1; i >= 0; i--) {
       Bullet b = playerBullets.get(i);
       b.update();
@@ -195,6 +201,7 @@ class Game {
       }
     }
 
+    // Feind-Bullets gegen Spieler
     for (int i = enemyBullets.size() - 1; i >= 0; i--) {
       Bullet b = enemyBullets.get(i);
       b.update();
@@ -203,9 +210,16 @@ class Game {
         player.lives--;
         enemyBullets.remove(i);
         if (player.lives <= 0) {
-          triggerTransition(4);
+          triggerTransition(4);  // Game Over
         }
       }
+    }
+  }
+
+  // Methode zur Überprüfung, ob das Level gewonnen wurde
+  void checkLevelWin() {
+    if (enemies.isEmpty()) {  // Alle Feinde und der Boss sind besiegt
+      triggerTransition(5);  // Wechsle zum Gewinnbildschirm
     }
   }
 
