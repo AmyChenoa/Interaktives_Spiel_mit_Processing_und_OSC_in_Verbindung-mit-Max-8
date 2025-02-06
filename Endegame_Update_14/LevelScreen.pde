@@ -4,11 +4,12 @@ class LevelScreen {
   Button backButton;
   Button[] levels = new Button[9];
   float alpha = 0;
-  PImage StartImage;
+  PImage StartImage; // Hintergrundbild für die Levelauswahl
 
   LevelScreen(Game g) {
     this.game = g;
 
+    // Standard Hintergrundbild
     StartImage = loadImage("./data./Weltall-4.png");
 
     for (int i = 0; i < stars.length; i++) {
@@ -41,6 +42,7 @@ class LevelScreen {
   }
 
   void drawBackground() {
+    // Hintergrundbild immer neu zeichnen
     image(StartImage, 0, 0, width, height); // Hintergrundbild einmal zeichnen
     for (Star s : stars) {
       s.update();
@@ -73,11 +75,15 @@ class LevelScreen {
     for (int i = 0; i < 9; i++) {
       if (levels[i].isClicked()) {
         println("Level " + (i + 1) + " Start!");
-        Level currentLevel = new Level(i + 1);
 
+        // Setze das Hintergrundbild für das gewählte Level in der Game-Klasse
+        game.backgroundImage = loadImage("./data./background" + (i + 1) + ".png");
+        game.backgroundImage.resize(width, height);
+
+        Level currentLevel = new Level(i + 1);
         currentLevel.initializeLevel(game);
 
-        game.triggerTransition(3);
+        game.triggerTransition(3);  // Wechsel zu Spielansicht (Level)
       }
     }
   }
