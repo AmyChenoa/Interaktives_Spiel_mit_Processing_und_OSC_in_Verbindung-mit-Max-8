@@ -33,7 +33,7 @@ class Button {
     rect(x, y, w, h, 10); // Zeichnet ein Rechteck mit abgerundeten Ecken für den Button
 
     // Text auf dem Button
-    fill(255); // Textfarbe Weiß
+    fill(mouseOver() ? color(0, 0, 0) : color(255)); // Textfarbe schwarz, wenn die Maus über dem Button ist, sonst weiß
     textAlign(CENTER, CENTER); // Text wird sowohl horizontal als auch vertikal zentriert
     textSize(20); // Schriftgröße für den Text auf dem Button
     text(label, x + w / 2, y + h / 2); // Zeichnet den Text in der Mitte des Buttons
