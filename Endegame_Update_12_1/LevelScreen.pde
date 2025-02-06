@@ -61,7 +61,7 @@ class LevelScreen {
 
     // Leuchtender Titel
     fill(0, 255, 255, alpha);
-     stroke(10); // Schwarze Umrandung
+    stroke(10); // Schwarze Umrandung
     text("CHOOSE A LEVEL", width / 2, height / 3);
   }
 
@@ -73,7 +73,7 @@ class LevelScreen {
     for (int i = 0; i < 9; i++) {
       if (levels[i].isClicked()) {
         println("Level " + (i + 1) + " Start!");
-        Level currentLevel = new Level(i + 1, 6, 90, false);
+        Level currentLevel = new Level(i + 1);
 
         currentLevel.initializeLevel(game);
 
