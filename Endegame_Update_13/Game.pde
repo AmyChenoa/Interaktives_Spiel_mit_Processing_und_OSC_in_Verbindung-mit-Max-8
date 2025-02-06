@@ -21,14 +21,16 @@ class Game {
   int nextScreen = 0;
 
   // Timer-Variablen
-  float levelTime = 30;  // 30 Sekunden für jedes Level (beispiel)
+  float levelTime = 30;
   float timeRemaining;
   boolean levelCompleted = false;
-  boolean gameStarted = false; // Der Timer wird erst nach Spielstart angezeigt
+  boolean gameStarted = false;
 
   // Fortschrittsbalken für den Level-Timer
   float levelTimeBarWidth = 500;
   float levelTimeBarHeight = 20;
+  float levelTimeBarX = 300;  // Verschiebung nach rechts
+  float levelTimeBarY = 15;   // Leicht nach unten
 
   Game() {
     enemies = new ArrayList<>();
@@ -43,7 +45,7 @@ class Game {
     winScreen = new WinScreen(this);
     introScreen = new IntroScreen(this);
     player = new Player();
-    level = new Level(1); // Anfangslevel
+    level = new Level(1);
   }
 
   void setup() {
@@ -61,46 +63,48 @@ class Game {
       renderScreen();
     }
 
-    // Timer-Balken wird nur angezeigt, wenn das Level läuft
     if (gameStarted && !levelCompleted) {
-      drawLevelTimerBar(20, 10, levelTimeBarWidth, levelTimeBarHeight);
+      drawLevelTimerBar(levelTimeBarX, levelTimeBarY, levelTimeBarWidth, levelTimeBarHeight);
     }
   }
 
   void drawLevelTimerBar(float x, float y, float width, float height) {
-    if (!gameStarted) return; // Der Timer wird nur angezeigt, wenn das Spiel gestartet wurde
+    if (!gameStarted) return;
 
-    // Hintergrund des Balkens mit Farbverlauf von grün nach rot
-    color c1 = color(0, 255, 0); // Grün
-    color c2 = color(255, 0, 0); // Rot
+    float progressWidth = map(timeRemaining, 0, levelTime, width, 0);
+
+    // Hintergrund des Balkens (dezent grau)
+    fill(50, 50, 50, 180);
+    noStroke();
+    rect(x, y, width, height, 10);
+
+    // Farbverlauf von grün nach rot
     for (float i = 0; i < width; i++) {
       float inter = map(i, 0, width, 0, 1);
-      color interColor = lerpColor(c1, c2, inter);
+      color interColor = lerpColor(color(0, 255, 0), color(255, 0, 0), inter);
       stroke(interColor);
       line(x + i, y, x + i, y + height);
     }
 
-    // Fortschrittsbalken (gelb) für den verbleibenden Timer
-    float progressWidth = map(timeRemaining, 0, levelTime, width, 0);
-    fill(255, 204, 0, 180); // Weichere gelbe Farbe mit Transparenz
+    // Fortschrittsbalken (deutlich erkennbar)
+    fill(255, 204, 0, 220);
     noStroke();
-    rect(x, y, progressWidth, height, 10); // Abgerundete Ecken für den Balken
+    rect(x, y, progressWidth, height, 10);
 
-    // Umrandung des Balkens
-    stroke(255);
+    // Verbesserte Umrandung (dunkler statt weiß)
+    stroke(0);
     noFill();
     rect(x, y, width, height, 10);
   }
 
   void startGame() {
-    gameStarted = true; // Timer wird erst nach Spielstart sichtbar
+    gameStarted = true;
   }
 
-
   void triggerTransition(int newScreen) {
-    nextScreen = newScreen;  // Set the next screen
-    isTransitioning = true;  // Start the transition
-    transitionProgress = 0;  // Reset the transition progress
+    nextScreen = newScreen;
+    isTransitioning = true;
+    transitionProgress = 0;
   }
 
   void renderTransition() {
@@ -150,6 +154,82 @@ class Game {
     }
   }
 
+  void playGame() {
+    image(backgroundImage, 0, 0);
+    player.update();
+    player.display();
+    drawHUD();
+
+    if (gameStarted && !levelCompleted) {
+      drawLevelTimerBar(levelTimeBarX, levelTimeBarY, levelTimeBarWidth, levelTimeBarHeight);
+    }
+
+    if (frameCount % level.spawnRate == 0) {
+      for (int i = 0; i < level.enemyCount; i++) {
+        enemies.add(new Enemy(random(30, width - 30), random(20, 100)));
+      }
+    }
+
+    if (!levelCompleted) {
+      timeRemaining -= 1.0 / frameRate;
+      if (timeRemaining <= 0) {
+        levelCompleted = true;
+        triggerTransition(5);
+      }
+    }
+
+    for (int i = powerUps.size() - 1; i >= 0; i--) {
+      PowerUp p = powerUps.get(i);
+      p.display();
+      if (p.isCollected(player.x, player.y)) {
+        player.collectPowerUp(p);
+        powerUps.remove(i);
+      }
+    }
+
+    for (int i = enemies.size() - 1; i >= 0; i--) {
+      Enemy e = enemies.get(i);
+      e.update();
+      e.display();
+      if (frameCount % 30 == 0) e.shoot(enemyBullets);
+      if (e.y > height) enemies.remove(i);
+    }
+
+    for (int i = playerBullets.size() - 1; i >= 0; i--) {
+      Bullet b = playerBullets.get(i);
+      b.update();
+      b.display();
+
+      for (int j = enemies.size() - 1; j >= 0; j--) {
+        Enemy e = enemies.get(j);
+        if (bulletHitsEnemy(b, e)) {
+          enemies.remove(j);
+          playerBullets.remove(i);
+          player.score += 10;
+          break;
+        }
+      }
+    }
+
+    for (int i = enemyBullets.size() - 1; i >= 0; i--) {
+      Bullet b = enemyBullets.get(i);
+      b.update();
+      b.display();
+      if (dist(b.x, b.y, player.x, player.y) < 15 && !player.shieldActive) {
+        player.lives--;
+        enemyBullets.remove(i);
+        if (player.lives <= 0) {
+          triggerTransition(4);
+        }
+      }
+    }
+  }
+
+  boolean bulletHitsEnemy(Bullet bullet, Enemy enemy) {
+    return dist(bullet.x, bullet.y, enemy.x, enemy.y) < enemy.size / 2;
+  }
+
+
   void mousePressed() {
     if (screen == 0) startScreen.mousePressed();
     else if (screen == 1) levelScreen.mousePressed();
@@ -188,134 +268,6 @@ class Game {
     gameStarted = false;
   }
 
-  void playGame() {
-    image(backgroundImage, 0, 0);
-    player.update();
-    player.display();
-    drawHUD();
-
-    // Timer-Balken nur anzeigen, wenn das Level läuft
-    if (gameStarted && !levelCompleted) {
-      drawLevelTimerBar(20, 10, levelTimeBarWidth, levelTimeBarHeight);
-    }
-
-    // Spawne Gegner und handle Gameplay
-    if (frameCount % level.spawnRate == 0) {
-      for (int i = 0; i < level.enemyCount; i++) {
-        enemies.add(new Enemy(random(30, width - 30), random(20, 100)));
-      }
-    }
-
-    // Timer Countdown
-    if (!levelCompleted) {
-      timeRemaining -= 1.0 / frameRate;
-      if (timeRemaining <= 0) {
-        levelCompleted = true;
-        triggerTransition(5); // Zum Win-Screen wechseln
-      }
-    }
-
-
-
-    // If the level has a boss, handle boss logic
-    if (level.hasBoss) {
-      for (int i = enemies.size() - 1; i >= 0; i--) {
-        if (enemies.get(i) instanceof Boss) {
-          Boss boss = (Boss) enemies.get(i);
-          boss.takeDamage();
-          if (boss.isDead()) {
-            player.score += 500;
-            enemies.remove(i);
-            // Check for level win after defeating the boss
-            levelCompleted = true;  // Mark the level as completed
-            triggerTransition(5);  // Transition to win screen
-            break;
-          }
-        }
-      }
-    }
-
-    // Handle power-ups
-    for (int i = powerUps.size() - 1; i >= 0; i--) {
-      PowerUp p = powerUps.get(i);
-      p.display();
-      if (p.isCollected(player.x, player.y)) {
-        player.collectPowerUp(p);
-        powerUps.remove(i);
-      }
-    }
-
-    // Handle enemies movement and shooting
-    for (int i = enemies.size() - 1; i >= 0; i--) {
-      Enemy e = enemies.get(i);
-      e.update();
-      e.display();
-      if (frameCount % 30 == 0) e.shoot(enemyBullets);
-      if (e.y > height) enemies.remove(i);
-    }
-
-    // Handle player bullets
-    for (int i = playerBullets.size() - 1; i >= 0; i--) {
-      Bullet b = playerBullets.get(i);
-      b.update();
-      b.display();
-
-      // Check for collisions between player bullets and enemies
-      for (int j = enemies.size() - 1; j >= 0; j--) {
-        Enemy e = enemies.get(j);
-        if (bulletHitsEnemy(b, e)) {
-          enemies.remove(j);
-          playerBullets.remove(i);
-          player.score += 10;
-          break;
-        }
-      }
-    }
-
-    // Handle enemy bullets and check for collisions with the player
-    for (int i = enemyBullets.size() - 1; i >= 0; i--) {
-      Bullet b = enemyBullets.get(i);
-      b.update();
-      b.display();
-      if (dist(b.x, b.y, player.x, player.y) < 15 && !player.shieldActive) {
-        player.lives--;
-        enemyBullets.remove(i);
-        if (player.lives <= 0) {
-          triggerTransition(4);  // Game over if player runs out of lives
-        }
-      }
-    }
-
-    // Timer countdown logic
-    if (!levelCompleted) {
-      timeRemaining -= 1.0 / frameRate;  // Decrease the time remaining based on frame rate
-      if (timeRemaining <= 0) {
-        // Level is completed if time runs out
-        levelCompleted = true;
-        triggerTransition(5);  // Transition to win screen
-      }
-    }
-  }
-
-  void drawTimerBar() {
-    float barWidth = width;
-    float barHeight = 10;
-    float timerProgress = timeRemaining / levelTime;
-
-    // Balken zeichnen
-    fill(255, 0, 0);
-    noStroke();
-    rect(0, 0, barWidth * timerProgress, barHeight);
-
-    // Optional: Umrandung des Balkens
-    stroke(255);
-    noFill();
-    rect(0, 0, barWidth, barHeight);
-  }
-
-  boolean bulletHitsEnemy(Bullet bullet, Enemy enemy) {
-    return dist(bullet.x, bullet.y, enemy.x, enemy.y) < enemy.size / 2;
-  }
 
   void drawLives(float x, float y, float width, int lives) {
     for (int i = 0; i < lives; i++) {
