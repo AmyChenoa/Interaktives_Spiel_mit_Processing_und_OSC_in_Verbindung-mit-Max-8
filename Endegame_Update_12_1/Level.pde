@@ -15,52 +15,62 @@ class Level {
 
     // Leichtere Level mit weniger Gegnern, langsamerer Spawnrate und mehr Power-Ups
     switch (levelNumber) {
-      case 1: // Einfacher Start, nur 1-2 Gegner
+      case 1: // Sehr einfacher Start, nur 1-2 Gegner und langsame Spawnrate
         enemyCount = 2;
-        spawnRate = 150;
+        spawnRate = 180;
         hasBoss = false;
+        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 1)); // Schild Power-Up
         break;
-      case 2: // Mehr Gegner, aber sehr langsame Spawnrate
+      case 2: // Weniger Gegner und langsame Spawnrate
+        enemyCount = 3;
+        spawnRate = 160;
+        hasBoss = false;
+        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 1)); // Schild Power-Up
+        break;
+      case 3: // Ein leichter Boss und weniger Gegner
         enemyCount = 3;
         spawnRate = 140;
-        hasBoss = false;
-        break;
-      case 3: // Erstes Boss-Level, aber weniger Feinde
-        enemyCount = 3;
-        spawnRate = 120;
         hasBoss = true;
+        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 1)); // Schild Power-Up
         break;
-      case 4: // Noch weniger Feinde, aber langsame Spawnrate
-        enemyCount = 4;
-        spawnRate = 130;
-        hasBoss = false;
-        break;
-      case 5: // Mehr Power-Ups
-        enemyCount = 3;
-        spawnRate = 100;
-        hasBoss = false;
-        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 1)); // Schild-Power-Up
-        break;
-      case 6: // Boss-Level mit wenigen Feinden
-        enemyCount = 4;
-        spawnRate = 110;
-        hasBoss = true;
-        break;
-      case 7: // Sehr wenige Gegner, aber Power-Ups
+      case 4: // Noch weniger Feinde und eine extrem langsame Spawnrate
         enemyCount = 2;
-        spawnRate = 150;
+        spawnRate = 200;
         hasBoss = false;
         powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 2)); // Extra Leben Power-Up
         break;
-      case 8: // Chaos-Level, aber nur wenige Gegner
+      case 5: // Mehr Power-Ups und weniger Gegner
         enemyCount = 3;
-        spawnRate = 180;
+        spawnRate = 150;
         hasBoss = false;
+        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 1)); // Schild Power-Up
+        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 2)); // Extra Leben Power-Up
         break;
-      case 9: // Finaler Boss, aber wenig Gegner
-        enemyCount = 2;
-        spawnRate = 100;
+      case 6: // Einfacher Boss, weniger Gegner und langsame Spawnrate
+        enemyCount = 3;
+        spawnRate = 160;
         hasBoss = true;
+        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 1)); // Schild Power-Up
+        break;
+      case 7: // Sehr wenige Gegner und viele Power-Ups
+        enemyCount = 2;
+        spawnRate = 200;
+        hasBoss = false;
+        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 2)); // Extra Leben Power-Up
+        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 1)); // Schild Power-Up
+        break;
+      case 8: // Chaos-Level, aber mit wenigen Gegnern und vielen Power-Ups
+        enemyCount = 2;
+        spawnRate = 200;
+        hasBoss = false;
+        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 1)); // Schild Power-Up
+        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 2)); // Extra Leben Power-Up
+        break;
+      case 9: // Finaler Boss, aber mit wenigen Gegnern und vielen Power-Ups
+        enemyCount = 2;
+        spawnRate = 150;
+        hasBoss = true;
+        powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 1)); // Schild Power-Up
         powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 2)); // Extra Leben Power-Up
         break;
       default:
@@ -85,7 +95,7 @@ class Level {
     
     // Boss spawnen, falls vorhanden
     if (hasBoss) {
-      game.enemies.add(new Boss(random(30, width - 30), random(20, 100), 200)); // Boss mit 200 HP
+      game.enemies.add(new Boss(random(30, width - 30), random(20, 100), 100)); // Einfacher Boss mit 100 HP
     }
 
     // Power-Ups hinzufügen
