@@ -48,4 +48,9 @@ class Bullet {
     // Zeichnet das Projektil als Kreis mit einem Durchmesser, der der Größe des Projektils entspricht
     ellipse(x, y, size, size);
   }
+
+  // Methode zum Überprüfen, ob das Projektil den Bildschirm verlassen hat
+  boolean isOutOfScreen() {
+    return x < 0 || x > width || y < 0 || y > height;
+  }
 }
