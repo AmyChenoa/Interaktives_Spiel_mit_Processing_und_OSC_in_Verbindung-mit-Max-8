@@ -24,6 +24,13 @@ class Game {
   float levelTime = 30;  // 30 Sekunden für jedes Level (beispiel)
   float timeRemaining;
   boolean levelCompleted = false;
+  // Neue Variable, um den Spielbeginn zu verfolgen
+  boolean gameStarted = false;
+
+  // Fortschrittsbalken für den Level-Timer
+  float levelTimeBarWidth = 500;
+  float levelTimeBarHeight = 20;
+
 
   Game() {
     enemies = new ArrayList<>();
@@ -60,6 +67,12 @@ class Game {
     if (!levelCompleted) {
       drawTimerBar(); // Zeigt den Timer-Balken an
     }
+  }
+
+  void triggerTransition(int newScreen) {
+    nextScreen = newScreen;  // Set the next screen
+    isTransitioning = true;  // Start the transition
+    transitionProgress = 0;  // Reset the transition progress
   }
 
   void renderTransition() {
@@ -118,23 +131,20 @@ class Game {
 
   void keyPressed() {
     if (screen == 0 && key == ENTER) {
-      triggerTransition(6);
+      triggerTransition(6); // Transition to intro screen
+      startGame();  // Start the game
     }
     if (screen == 6 && key == ENTER) {
-      triggerTransition(3);
+      triggerTransition(3);  // Transition to the gameplay screen
+      startGame();  // Start the game
     }
     if ((screen == 4 || screen == 5) && key == ENTER) {
       resetGame();
-      triggerTransition(0);
+      triggerTransition(0); // Go back to the start screen
     }
     if (screen == 3 && key == ' ') {
-      player.shoot(playerBullets);
+      player.shoot(playerBullets);  // Player shooting action
     }
-  }
-
-  void triggerTransition(int newScreen) {
-    isTransitioning = true;
-    nextScreen = newScreen;
   }
 
   void resetGame() {
@@ -144,16 +154,21 @@ class Game {
     enemyBullets.clear();
     powerUps.clear();
     platforms.clear();
-    levelCompleted = false;  // Setzt das Level als nicht abgeschlossen
+    levelCompleted = false;  // Set level as not completed
     screen = 0;
-    timeRemaining = levelTime;  // Timer zurücksetzen
+    timeRemaining = levelTime;  // Reset timer
+    gameStarted = false;  // Reset game started flag
   }
-
   void playGame() {
     image(backgroundImage, 0, 0);
     player.update();
     player.display();
     drawHUD();
+
+    // Only show the level timer bar if the game has started
+    if (gameStarted) {
+      drawLevelTimerBar(20, 10, levelTimeBarWidth, levelTimeBarHeight);
+    }
 
     // Spawn enemies at intervals based on the level's spawn rate
     if (frameCount % level.spawnRate == 0) {
@@ -240,6 +255,28 @@ class Game {
         triggerTransition(5);  // Transition to win screen
       }
     }
+  }
+  void startGame() {
+    gameStarted = true;  // Set the flag to true when the game starts
+  }
+
+  // Funktion, um den Timer-Balken schön anzuzeigen
+  void drawLevelTimerBar(float x, float y, float width, float height) {
+    // Farbverlauf von grün (für viel Zeit) zu rot (für wenig Zeit)
+    color c1 = color(0, 255, 0); // grün
+    color c2 = color(255, 0, 0); // rot
+    for (float i = 0; i < width; i++) {
+      float inter = map(i, 0, width, 0, 1);
+      color interColor = lerpColor(c1, c2, inter);
+      stroke(interColor);
+      line(x + i, y, x + i, y + height);  // Vertikale Linien für Farbverlauf
+    }
+
+    // Fortschrittsbalken (gelb) für den verbleibenden Timer
+    float progressWidth = map(timeRemaining, 0, levelTime, width, 0);  // Berechne den Fortschritt
+    fill(255, 255, 0);  // Gelbe Farbe für den Fortschritt
+    noStroke();
+    rect(x, y, progressWidth, height, 10);  // Abgerundete Ecken für den Balken
   }
 
 
