@@ -109,11 +109,16 @@ class Game {
   void startGame() {
     gameStarted = true;
   }
-
   void triggerTransition(int newScreen) {
     nextScreen = newScreen;
     isTransitioning = true;
     transitionProgress = 0;
+
+    // Aktualisiere das Hintergrundbild, wenn der Level gewechselt wird
+    if (newScreen == 3) {  // Wenn wir ins Spiel (Level) wechseln
+      backgroundImage = loadImage("./data./background" + level.getLevelNumber() + ".png");
+      backgroundImage.resize(width, height); // An die Fenstergröße anpassen
+    }
   }
 
   void renderTransition() {
