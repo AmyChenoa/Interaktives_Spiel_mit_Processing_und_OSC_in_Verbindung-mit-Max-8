@@ -1,4 +1,5 @@
 class Game {
+  PApplet parent;
   int screen = 0;
   PImage backgroundImage;
   ArrayList<Enemy> enemies;
@@ -62,44 +63,47 @@ class Game {
     } else {
       renderScreen();
     }
-
-    if (gameStarted && !levelCompleted) {
-      drawLevelTimerBar(levelTimeBarX, levelTimeBarY, levelTimeBarWidth, levelTimeBarHeight);
-    }
   }
-  void drawLevelTimerBar(float x, float y, float width, float height) {
-    if (!gameStarted) return;
 
-    // Balken komplett auf Bildschirmbreite setzen
-    width = width = width - x;  // Automatische Anpassung an den rechten Rand
 
-    // Überschrift leicht nach unten verschoben, damit sie nicht abgeschnitten wird
+  void drawLevelTimerBar(float x, float y, float height) {
+    if (!gameStarted || screen != 3) return;  // Timer nur im Spiel anzeigen
+
+    // Set margin to move the bar slightly away from the right edge
+    float margin = 20;
+    // Berechne die Breite des Balkens, basierend auf der verbleibenden Zeit, mit einem Abstand vom rechten Rand
+    float barWidth = width - x - margin;  // Subtract the margin from the right
+
+    // Alles nach unten verschieben
+    y += 20;
+
+    // Überschrift über dem Balken
     fill(255);
     textSize(16);
     textAlign(LEFT, CENTER);
-    text("Remaining Time", x, y + height + 5);  // Weiter nach unten versetzt
+    text("Remaining Time", x, y - 15);
 
-    float progressWidth = map(timeRemaining, 0, levelTime, width, 0);
+    // Berechne die Breite des Fortschrittsbalkens
+    float progressWidth = map(timeRemaining, 0, levelTime, barWidth, 0);
 
-    // Hintergrund des Balkens (heller Grau-Verlauf)
-    fill(220, 220, 220, 150);
+    // Hintergrund-Balken (hellgrau, weich)
+    fill(220, 220, 220, 150);  // Transparenz auf 150 setzen, damit es sichtbar ist
     noStroke();
-    rect(x, y, width, height, 10);
+    rect(x, y, barWidth, height, 10);
 
     // Farbverlauf von Hellgrün nach Hellrot
-    for (float i = 0; i < width; i++) {
-      float inter = map(i, 0, width, 0, 1);
+    for (float i = 0; i < barWidth; i++) {
+      float inter = map(i, 0, barWidth, 0, 1);
       color interColor = lerpColor(color(144, 238, 144), color(255, 140, 140), inter);
       stroke(interColor);
       line(x + i, y, x + i, y + height);
     }
 
     // Fortschrittsbalken (kräftiges Gelb-Orange)
-    fill(255, 165, 0, 220);
+    fill(255, 165, 0, 220);  // Diese Farbe ist jetzt mehr sichtbar
     noStroke();
     rect(x, y, progressWidth, height, 10);
   }
-
 
 
   void startGame() {
@@ -165,9 +169,8 @@ class Game {
     player.display();
     drawHUD();
 
-    if (gameStarted && !levelCompleted) {
-      drawLevelTimerBar(levelTimeBarX, levelTimeBarY, levelTimeBarWidth, levelTimeBarHeight);
-    }
+    // Call drawLevelTimerBar with proper arguments
+    drawLevelTimerBar(levelTimeBarX, levelTimeBarY, levelTimeBarHeight);
 
     if (frameCount % level.spawnRate == 0) {
       for (int i = 0; i < level.enemyCount; i++) {
@@ -230,6 +233,7 @@ class Game {
     }
   }
 
+
   boolean bulletHitsEnemy(Bullet bullet, Enemy enemy) {
     return dist(bullet.x, bullet.y, enemy.x, enemy.y) < enemy.size / 2;
   }
@@ -291,7 +295,7 @@ class Game {
     fill(40, 40, 40, 200);
     noStroke();
     rect(10, 10, 270, 120, 20);
-    fill(0, 255, 255);
+    fill(255);
     textSize(24);
     textAlign(CENTER, TOP);
     text("Punkte: " + player.score, 145, 20);
