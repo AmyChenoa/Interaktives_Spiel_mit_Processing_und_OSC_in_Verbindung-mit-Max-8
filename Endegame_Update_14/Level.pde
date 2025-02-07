@@ -9,30 +9,33 @@ class Level {
 
   Level(int levelNumber) {
     this.levelNumber = levelNumber;
-    powerUps = new ArrayList<>();
-    platforms = new ArrayList<>();
-    // Set the number of enemies and spawn rate based on the level
-    setLevelAttributes();
+    this.powerUps = new ArrayList<>();
+    this.platforms = new ArrayList<>();
+    setupLevel(); // Direkt das Level konfigurieren
   }
 
-  void setLevelAttributes() {
-    // Define the attributes based on the level
+  void setupLevel() {
     switch (levelNumber) {
     case 1:
+      background = loadImage("data./background1.png");
       enemyCount = 1;
       spawnRate = 250;
       hasBoss = false;
       powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 1));
       platforms.add(new Platform(100, 300, 150, 20));
       break;
+
     case 2:
+      background = loadImage("data./background2.png");
       enemyCount = 1;
       spawnRate = 270;
       hasBoss = false;
       powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 2));
       platforms.add(new Platform(200, 250, 100, 20));
       break;
+
     case 3:
+      background = loadImage("data./background3.png");
       enemyCount = 2;
       spawnRate = 280;
       hasBoss = false;
@@ -41,21 +44,27 @@ class Level {
       platforms.add(new Platform(150, 200, 120, 20));
       platforms.add(new Platform(250, 350, 130, 20));
       break;
+
     case 4:
+      background = loadImage("data./background4.png");
       enemyCount = 2;
       spawnRate = 300;
       hasBoss = false;
       powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 2));
       platforms.add(new Platform(120, 270, 160, 20));
       break;
+
     case 5:
+      background = loadImage("data./background5.png");
       enemyCount = 2;
       spawnRate = 320;
       hasBoss = false;
       powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 1));
       platforms.add(new Platform(180, 220, 140, 20));
       break;
+
     case 6:
+      background = loadImage("data./background6.png");
       enemyCount = 3;
       spawnRate = 300;
       hasBoss = true;
@@ -63,7 +72,9 @@ class Level {
       platforms.add(new Platform(100, 260, 130, 20));
       platforms.add(new Platform(250, 180, 110, 20));
       break;
+
     case 7:
+      background = loadImage("data./background7.png");
       enemyCount = 2;
       spawnRate = 330;
       hasBoss = false;
@@ -71,7 +82,9 @@ class Level {
       powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 2));
       platforms.add(new Platform(160, 210, 120, 20));
       break;
+
     case 8:
+      background = loadImage("data./background8.png");
       enemyCount = 2;
       spawnRate = 350;
       hasBoss = true;
@@ -79,7 +92,9 @@ class Level {
       powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 2));
       platforms.add(new Platform(200, 240, 130, 20));
       break;
+
     case 9:
+      background = loadImage("data./background9.png");
       enemyCount = 1;
       spawnRate = 340;
       hasBoss = true;
@@ -87,31 +102,43 @@ class Level {
       powerUps.add(new PowerUp(random(30, width - 30), random(20, 100), 2));
       platforms.add(new Platform(150, 200, 150, 20));
       break;
+
     default:
+      background = loadImage("data./Weltall-1.png"); // Falls kein Level erkannt wird
       enemyCount = 1;
       spawnRate = 300;
       hasBoss = false;
       break;
     }
-  }
 
-  // Method to return the current level number
-  int getLevelNumber() {
-    return levelNumber;
+    if (background == null) {
+      println("Fehler: Hintergrundbild für Level " + levelNumber + " nicht gefunden!");
+    } else {
+      println("Hintergrund für Level " + levelNumber + " geladen.");
+    }
   }
 
   void initializeLevel(Game game) {
+    game.backgroundImage = this.background;
+
+    if (game.backgroundImage != null) {
+      println("🎨 Hintergrund für Level " + levelNumber + " gesetzt: " + game.backgroundImage);
+    } else {
+      println("❌ Fehler: Kein Hintergrundbild für Level " + levelNumber + " gefunden!");
+    }
+
     game.enemies.clear();
     game.powerUps.clear();
+    game.platforms.clear();
+    game.player.reset();
+
     if (game.platforms != null) {
       game.platforms.clear();
     } else {
-      println("Die Plattformen-Liste ist null!");
+      println("Warnung: Die Plattformen-Liste ist null!");
     }
 
-    game.player.reset();
 
-    // Überprüfen, ob die Plattformen korrekt hinzugefügt wurden
     if (platforms.isEmpty()) {
       println("Warnung: Keine Plattformen für dieses Level!");
     } else {
