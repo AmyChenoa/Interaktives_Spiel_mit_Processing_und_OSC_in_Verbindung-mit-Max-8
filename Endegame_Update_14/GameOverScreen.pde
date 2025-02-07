@@ -5,10 +5,12 @@ class GameOverScreen {
   int currentScore = 0; // Der aktuelle Score nach dem Spiel
   Game game;  // Referenz auf das Game-Objekt (wird aktuell nicht verwendet)
   Star[] stars = new Star[150];  // Array für die Sterne im Hintergrund
+  PImage GameOverImage;
 
   // Konstruktor: Initialisiert die Sterne und lädt den Highscore
   GameOverScreen(Game game) {
     this.game = game; // Initialisierung der game-Referenz
+    GameOverImage = loadImage("./data./GameOverScreen.png");
     for (int i = 0; i < stars.length; i++) {
       stars[i] = new Star();
     }
@@ -18,7 +20,7 @@ class GameOverScreen {
 
   // Zeichnet den Hintergrund und lässt die Sterne bewegen
   void drawBackground() {
-    background(0);  // Setzt den Hintergrund auf schwarz
+    image(GameOverImage, 0, 0, width, height); // Hintergrundbild einmal zeichnen
     for (Star s : stars) {  // Aktualisiert und zeigt jeden Stern
       s.update();  // Position des Sterns anpassen
       s.show();  // Stern anzeigen
@@ -33,8 +35,8 @@ class GameOverScreen {
 
     drawGameOverText(dynamicAlpha);
     drawScoreBox(dynamicAlpha);
-    drawHighScoreText(dynamicAlpha);
-    drawRestartText(dynamicAlpha);
+    drawHighScoreText();
+    drawRestartText();
 
     if (currentScore > highScore) {
       highScore = currentScore;
@@ -84,7 +86,7 @@ class GameOverScreen {
   }
 
   // Zeichnet den Text für den Highscore
-  void drawHighScoreText(float alpha) {
+  void drawHighScoreText() {
     textSize(30);  // Textgröße
     float highScoreTextAlpha = 150 + 105 * sin(millis() * 0.005);  // Berechnet die pulsierende Transparenz
     fill(0, 0, 0, highScoreTextAlpha);  // Schatten des Textes
@@ -100,7 +102,7 @@ class GameOverScreen {
   }
 
   // Zeichnet den Text für den Restart-Hinweis
-  void drawRestartText(float alpha) {
+  void drawRestartText() {
     textSize(30);  // Textgröße
     float restartTextAlpha = 150 + 105 * sin(millis() * 0.005);  // Berechnet die pulsierende Transparenz
     fill(0, 0, 0, restartTextAlpha);  // Schatten des Textes
