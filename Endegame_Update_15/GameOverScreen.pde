@@ -1,17 +1,17 @@
-// Definition der Klasse GameOverScreen
+// 🌌 Game Over Screen mit Sci-Fi Feeling
 class GameOverScreen {
-  int highScore = 0;  
-  int currentScore = 0; 
-  Game game;  
-  Star[] stars = new Star[150];  
+  int highScore = 0;
+  int currentScore = 0;
+  Game game;
+  Star[] stars = new Star[200];
   PImage gameOverImage;
-  PFont gameOverFont;
+  PFont gameFont;
 
-  // Konstruktor
+  // 🎮 Konstruktor
   GameOverScreen(Game game) {
-    this.game = game; 
-    gameOverImage = loadImage("data./GameOverScreen.png");  // Statischer Hintergrund
-    gameOverFont = createFont("Arial Black", 48); // Kräftige Schrift für "GAME OVER"
+    this.game = game;
+    gameOverImage = loadImage("data./GameOverScreen.png");  // Sternenhintergrund
+    gameFont = createFont("Orbitron-Bold", 50); // Futuristische Schriftart
 
     for (int i = 0; i < stars.length; i++) {
       stars[i] = new Star();
@@ -20,23 +20,25 @@ class GameOverScreen {
     loadHighScore();
   }
 
-  // Hintergrund mit Sternen
+
+  // 🌠 Hintergrund mit Sternen
   void drawBackground() {
-    image(gameOverImage, 0, 0, width, height); 
-    for (Star s : stars) {  
-      s.update();  
-      s.show();  
+    image(gameOverImage, 0, 0, width, height);
+
+    for (Star s : stars) {
+      s.update();
+      s.show();
     }
   }
 
-  // Anzeige des Game Over Screens
+  // 🔥 Hauptanzeige
   void display(int finalScore) {
     currentScore = finalScore;
     drawBackground();
-    
-    float dynamicAlpha = 150 + 105 * sin(millis() * 0.005);
-    drawGameOverText(dynamicAlpha);
-    drawScoreBox(dynamicAlpha);
+
+    float glowIntensity = 100 + 80 * sin(millis() * 0.005);
+    drawGameOverText(glowIntensity);
+    drawScoreBox();
     drawHighScoreText();
     drawRestartText();
 
@@ -46,67 +48,54 @@ class GameOverScreen {
     }
   }
 
-  // 🎨 "GAME OVER"-Text mit Glow & sanften Schatten
+  // ✨ "GAME OVER" mit sanftem Glow
   void drawGameOverText(float alpha) {
     textAlign(CENTER);
-    textFont(gameOverFont);
+    textFont(gameFont);
     textSize(90);
 
-    float glowOffset = 6;
-    for (int i = 3; i > 0; i--) { 
-      fill(255, 0, 0, alpha - (i * 40)); 
-      text("GAME OVER", width / 2 + i * glowOffset, height / 4 + i * glowOffset);
-    }
-
-    fill(255, 255, 0);
+    // Sanfter Glow
+    fill(0, 200, 255, alpha);
     text("GAME OVER", width / 2, height / 4);
+
+    fill(255);
+    text("GAME OVER", width / 2, height / 4 - 3);
   }
 
-  // 🏆 Animierte Score-Box mit Glow-Effekt
-  void drawScoreBox(float alpha) {
+  // 🏆 Dezente Score-Box
+  void drawScoreBox() {
     rectMode(CENTER);
-    float pulsate = 2 * sin(millis() * 0.01);
 
-    // Box mit weichem Glow
-    fill(0, 0, 0, 180);
-    stroke(255, 0, 0, 150);
-    strokeWeight(4);
-    rect(width / 2, height / 2 - 80, 360 + pulsate, 90 + pulsate, 20);
+    fill(10, 10, 30, 200);
+    stroke(0, 200, 255, 150);
+    strokeWeight(2);
+    rect(width / 2, height / 2 - 70, 320, 70, 15);
 
-    textSize(38);
-    fill(255, 255, 255, alpha);
-    text("Score: " + currentScore, width / 2, height / 2 - 75);
-  }
-
-  // 🔥 Highscore-Text, jetzt mit leuchtendem Effekt
-  void drawHighScoreText() {
     textSize(35);
-    float highScoreAlpha = 150 + 105 * sin(millis() * 0.005);
-
-    for (int i = 3; i > 0; i--) {
-      fill(255, 215, 0, highScoreAlpha - (i * 30));
-      text("Highscore: " + highScore, width / 2 + i, height / 2 + 90 + i);
-    }
-
-    fill(255, 255, 255, highScoreAlpha);
-    text("Highscore: " + highScore, width / 2, height / 2 + 90);
+    fill(255);
+    text("Score: " + currentScore, width / 2, height / 2 - 55);
   }
 
-  // 🔄 Blinkender "Press ENTER to Restart"-Text
-  void drawRestartText() {
+  // 🌟 Highscore-Anzeige mit dezentem Neon-Effekt
+  void drawHighScoreText() {
     textSize(30);
-    float restartAlpha = 150 + 105 * sin(millis() * 0.01);
+    fill(0, 180, 255, 180);
+    text("Highscore: " + highScore, width / 2, height / 2 + 50);
 
-    for (int i = 2; i > 0; i--) {
-      fill(0, 0, 0, restartAlpha - (i * 30));
-      text("Press ENTER to Restart", width / 2 + i, height / 2 + 170 + i);
-    }
-
-    fill(255, 255, 255, restartAlpha);
-    text("Press ENTER to Restart", width / 2, height / 2 + 170);
+    fill(255);
+    text("Highscore: " + highScore, width / 2, height / 2 + 47);
   }
 
-  // Highscore speichern/laden
+  // 🔄 Sanfter, pulsierender Restart-Text
+  void drawRestartText() {
+    textSize(28);
+    float restartAlpha = 150 + 80 * sin(millis() * 0.008);
+
+    fill(0, 180, 255, restartAlpha);
+    text("Press ENTER to Restart", width / 2, height / 2 + 130);
+  }
+
+  // 🛸 Highscore-System
   void loadHighScore() {
     try {
       String[] data = loadStrings("highscore.txt");
@@ -115,7 +104,7 @@ class GameOverScreen {
       }
     }
     catch (Exception e) {
-      println("Fehler beim Laden des Highscores: " + e.getMessage());
+      println("⚠ Fehler beim Laden des Highscores: " + e.getMessage());
       highScore = 0;
     }
   }
@@ -125,15 +114,15 @@ class GameOverScreen {
     saveStrings("highscore.txt", data);
   }
 
-  // Spiel zurücksetzen
+  // 🚀 Spiel zurücksetzen
   void resetGame() {
-    currentScore = 0;  
+    currentScore = 0;
     for (int i = 0; i < stars.length; i++) {
       stars[i] = new Star();
     }
   }
 
-  // Neustart per ENTER-Taste
+  // 🕹 Neustart per ENTER-Taste
   void keyPressed() {
     if (keyCode == ENTER) {
       resetGame();
