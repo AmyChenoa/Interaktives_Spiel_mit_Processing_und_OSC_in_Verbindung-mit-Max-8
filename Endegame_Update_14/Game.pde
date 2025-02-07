@@ -50,7 +50,7 @@ class Game {
   }
 
   void setup() {
-    backgroundImage = loadImage("./data./Weltall-1.png");
+    backgroundImage = level.background;
     backgroundImage.resize(width, height);
     resetGame();
     frameRate(60);
@@ -61,47 +61,40 @@ class Game {
     if (isTransitioning) {
       renderTransition();
     } else {
+      if (backgroundImage != null) {
+        image(backgroundImage, 0, 0);
+      } else {
+        println(" Kein Hintergrundbild gesetzt!");
+      }
       renderScreen();
     }
   }
 
 
+
   void drawLevelTimerBar(float x, float y, float height) {
     if (!gameStarted || screen != 3) return;  // Timer nur im Spiel anzeigen
 
-    // Set margin to move the bar slightly away from the right edge
     float margin = 20;
-    // Berechne die Breite des Balkens, basierend auf der verbleibenden Zeit, mit einem Abstand vom rechten Rand
-    float barWidth = width - x - margin;  // Subtract the margin from the right
+    float barWidth = width - x - margin;  // Fortschrittsbalken berechnen
 
-    // Alles nach unten verschieben
-    y += 20;
+    // Timer-Balken zeichnen
+    y += 20;  // Nach unten verschieben
 
-    // Überschrift über dem Balken
     fill(255);
     textSize(16);
     textAlign(LEFT, CENTER);
     text("Remaining Time", x, y - 15);
 
-    // Berechne die Breite des Fortschrittsbalkens
     float progressWidth = map(timeRemaining, 0, levelTime, barWidth, 0);
 
-    // Hintergrund-Balken (hellgrau, weich)
-    fill(220, 220, 220, 150);  // Transparenz auf 150 setzen, damit es sichtbar ist
+    // Hintergrund-Balken
+    fill(220, 220, 220, 150);
     noStroke();
     rect(x, y, barWidth, height, 10);
 
-    // Farbverlauf von Hellgrün nach Hellrot
-    for (float i = 0; i < barWidth; i++) {
-      float inter = map(i, 0, barWidth, 0, 1);
-      color interColor = lerpColor(color(144, 238, 144), color(255, 140, 140), inter);
-      stroke(interColor);
-      line(x + i, y, x + i, y + height);
-    }
-
-    // Fortschrittsbalken (kräftiges Gelb-Orange)
-    fill(255, 165, 0, 220);  // Diese Farbe ist jetzt mehr sichtbar
-    noStroke();
+    // Fortschrittsbalken
+    fill(255, 165, 0, 220);
     rect(x, y, progressWidth, height, 10);
   }
 
@@ -109,16 +102,11 @@ class Game {
   void startGame() {
     gameStarted = true;
   }
+
   void triggerTransition(int newScreen) {
     nextScreen = newScreen;
     isTransitioning = true;
     transitionProgress = 0;
-
-    // Aktualisiere das Hintergrundbild, wenn der Level gewechselt wird
-    if (newScreen == 3) {  // Wenn wir ins Spiel (Level) wechseln
-      backgroundImage = loadImage("./data./background" + level.getLevelNumber() + ".png");
-      backgroundImage.resize(width, height); // An die Fenstergröße anpassen
-    }
   }
 
   void renderTransition() {
@@ -168,29 +156,56 @@ class Game {
     }
   }
 
+  void switchLevel(int newLevelNumber) {
+    level = new Level(newLevelNumber);
+    level.initializeLevel(this);
+
+    backgroundImage = level.background;
+    println("Aktualisiertes Hintergrundbild für Level " + newLevelNumber + ": " + backgroundImage);
+
+    timeRemaining = levelTime;
+    gameStarted = true;
+  }
+
+
+
   void playGame() {
-    image(backgroundImage, 0, 0);
+    if (backgroundImage != null) {
+      println("Zeichne Hintergrund in playGame(): " + backgroundImage);
+      image(backgroundImage, 0, 0);
+    } else {
+      println("⚠️ Kein Hintergrundbild in playGame() gesetzt!");
+    }
+
+
+    // Timer runterzählen
+    if (gameStarted && timeRemaining > 0) {
+      timeRemaining -= 1 / frameRate;  // Verringere Timer pro Frame
+    }
+
     player.update();
     player.display();
     drawHUD();
-
-    // Call drawLevelTimerBar with proper arguments
     drawLevelTimerBar(levelTimeBarX, levelTimeBarY, levelTimeBarHeight);
 
+    // Feinde spawnen
     if (frameCount % level.spawnRate == 0) {
       for (int i = 0; i < level.enemyCount; i++) {
         enemies.add(new Enemy(random(30, width - 30), random(20, 100)));
       }
     }
 
-    if (!levelCompleted) {
-      timeRemaining -= 1.0 / frameRate;
-      if (timeRemaining <= 0) {
-        levelCompleted = true;
-        triggerTransition(5);
+    // Levelwechsel, wenn Timer abgelaufen
+    if (timeRemaining <= 0) {
+      levelCompleted = true;
+      if (level.levelNumber < 9) {
+        switchLevel(level.levelNumber + 1);
+      } else {
+        triggerTransition(5);  // Win-Screen
       }
     }
 
+    // Feinde und Power-Ups aktualisieren
     for (int i = powerUps.size() - 1; i >= 0; i--) {
       PowerUp p = powerUps.get(i);
       p.display();
@@ -305,24 +320,5 @@ class Game {
     textAlign(CENTER, TOP);
     text("Punkte: " + player.score, 145, 20);
     drawLives(100, 50, 22, player.lives);
-  }
-
-
-
-  void drawPowerUpTimer(float x, float y, float barWidth, float barHeight, float timer, float maxTimer, color barColor) {
-    float timerProgress = timer / maxTimer;
-    fill(barColor);
-    rect(x, y, barWidth * timerProgress, barHeight, 6);
-    stroke(255);
-    noFill();
-    rect(x, y, barWidth, barHeight, 6);
-    // Timer-Balken (innerer farbiger Bereich)
-    fill(barColor);
-    rect(x, y, barWidth * timerProgress, barHeight, 6); // Timer-Balken nur mit fortschreitendem Wert
-
-    // Weiße Umrandung
-    stroke(255);
-    noFill();
-    rect(x, y, barWidth, barHeight, 6); // Weiße Umrandung
   }
 }
