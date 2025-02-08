@@ -3,11 +3,10 @@ class WinScreen {
   float alpha = 0;
   Game game;
   PImage WinImage;
-  PFont winFont;
   int highScore = 0;
   int currentScore = 0;
-  String name = "";
-  Table table;
+
+
 
   WinScreen(Game game) {
     this.game = game;
@@ -16,22 +15,22 @@ class WinScreen {
     for (int i = 0; i < stars.length; i++) {
       stars[i] = new Star();
     }
-    loadHighScore();
-    table = loadTable("data./new.csv", "header");
   }
 
   void display(int score) {
     currentScore = score;
     drawBackground();
     drawTitle();
-    drawScore(score);
+    drawScore();
     drawHighScoreText();
     drawRestartText();
-    drawNameInput();
+    updateHighScore();
+  }
 
-    if (currentScore > highScore) {
-      highScore = currentScore;
-      saveHighScore();
+  void updateHighScore() {
+    if (currentScore > game.highScore) {
+      game.highScore = currentScore;
+      game.saveHighScore();
     }
   }
 
@@ -58,11 +57,10 @@ class WinScreen {
     text("YOU WIN!", width / 2, height / 4);
   }
 
-  void drawScore(int score) {
-    textAlign(CENTER);
-    textSize(80);
+  void drawScore() {
     fill(255);
-    text("Final Score: " + score, width / 2, height * 2 / 3);
+    textSize(20);
+    text("Your Score: " + currentScore, width / 2, height / 2);
   }
 
   void drawHighScoreText() {
@@ -79,51 +77,5 @@ class WinScreen {
     float restartAlpha = 150 + 80 * sin(millis() * 0.008);
     fill(0, 180, 255, restartAlpha);
     text("Press ENTER to Restart", width / 2, height * 2 / 3 + 140);
-  }
-
-  void drawNameInput() {
-    textAlign(CENTER);
-    textSize(40);
-    fill(255);
-    text("Enter Name: " + name, width / 2, height - 100);
-  }
-
-  void loadHighScore() {
-    try {
-      String[] data = loadStrings("highscore.txt");
-      if (data != null && data.length > 0) {
-        highScore = Integer.parseInt(data[0].trim());
-      }
-    }
-    catch (Exception e) {
-      println("Fehler beim Laden des Highscores: " + e.getMessage());
-      highScore = 0;
-    }
-  }
-
-  void saveHighScore() {
-    String[] data = {str(highScore)};
-    saveStrings("highscore.txt", data);
-  }
-
-  void keyPressed() {
-    if (key == ENTER) {
-      TableRow newRow = table.addRow();
-      newRow.setInt("punkte", currentScore);
-      newRow.setString("name", name);
-
-      table.sortReverse("punkte");
-      if (table.getRowCount() > 10) {
-        table.removeRow(table.getRowCount()-1);
-      }
-      saveTable(table, "data/new.csv");
-      game.triggerTransition(1);
-    }
-    if (key == BACKSPACE && name.length() > 0) {
-      name = name.substring(0, name.length() - 1);
-    }
-    if (name.length() < 10 && key >= 32 && key <= 126) {
-      name += key;
-    }
   }
 }
