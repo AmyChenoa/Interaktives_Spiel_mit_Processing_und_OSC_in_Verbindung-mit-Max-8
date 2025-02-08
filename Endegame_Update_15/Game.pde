@@ -6,7 +6,6 @@ class Game {
   ArrayList<Bullet> playerBullets;
   ArrayList<Bullet> enemyBullets;
   ArrayList<PowerUp> powerUps;
-  ArrayList<Platform> platforms;
 
   Player player;
   StartScreen startScreen;
@@ -38,7 +37,6 @@ class Game {
     playerBullets = new ArrayList<>();
     enemyBullets = new ArrayList<>();
     powerUps = new ArrayList<>();
-    platforms = new ArrayList<>();
     startScreen = new StartScreen(this);
     levelScreen = new LevelScreen(this);
     helpScreen = new HelpScreen(this);
@@ -63,7 +61,7 @@ class Game {
     } else {
       if (backgroundImage != null) {
         backgroundImage.resize(width, height);
-         image(backgroundImage, 0, 0, width, height);
+        image(backgroundImage, 0, 0, width, height);
       } else {
         println(" Kein Hintergrundbild gesetzt!");
       }
@@ -169,7 +167,7 @@ class Game {
 
   void playGame() {
     if (backgroundImage != null) {
-        backgroundImage.resize(width, height);
+      backgroundImage.resize(width, height);
       image(backgroundImage, 0, 0);
     } else {
       println("Kein Hintergrundbild in playGame() gesetzt!");
@@ -288,7 +286,6 @@ class Game {
     playerBullets.clear();
     enemyBullets.clear();
     powerUps.clear();
-    platforms.clear();
     levelCompleted = false;
     screen = 0;
     timeRemaining = levelTime;
