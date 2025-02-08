@@ -70,8 +70,7 @@ class LevelScreen {
     for (int i = 0; i < levels.length; i++) {
       if (levels[i].isClicked()) {
         println("Level " + (i + 1) + " Start!");
-        Level currentLevel = new Level(i + 1);
-        currentLevel.initializeLevel(game);
+        game.switchLevel(i + 1);  // Richtigen Level-Übergang setzen
         game.triggerTransition(3);
         break;
       }
