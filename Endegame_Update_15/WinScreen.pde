@@ -1,97 +1,129 @@
 class WinScreen {
-  Star[] stars = new Star[150];  // Hintergrundsterne für die Animation
-  float alpha = 0;  // Transparenz für pulsierende Texteffekte
-  Game game;  // Referenz auf das Game-Objekt, um Übergänge zu verwalten
+  Star[] stars = new Star[150];
+  float alpha = 0;
+  Game game;
   PImage WinImage;
+  PFont winFont;
+  int highScore = 0;
+  int currentScore = 0;
+  String name = "";
+  Table table;
 
-  // Konstruktor: Initialisiert den Gewinnbildschirm und erstellt die Sterne im Hintergrund
   WinScreen(Game game) {
-    this.game = game;  // Speichert die Referenz auf das Game-Objekt
-    WinImage = loadImage("./data./WinScreen.png");
+    this.game = game;
+    WinImage = loadImage("data./WinScreen.png");
 
-    // Erstelle die Sterne im Hintergrund
     for (int i = 0; i < stars.length; i++) {
-      stars[i] = new Star();  // Jedes Sternobjekt wird in das Array eingefügt
+      stars[i] = new Star();
     }
+    loadHighScore();
+    table = loadTable("data./new.csv", "header");
   }
 
-  // Anzeige-Methode für den Gewinnbildschirm
   void display(int score) {
-    // Hintergrundanimation (Sterne bewegen sich)
+    currentScore = score;
     drawBackground();
-
-    // Titel "You Win!" mit pulsierenden Effekten
     drawTitle();
-
-    // Zeigt den finalen Punktestand an
     drawScore(score);
-
-    // Zeigt den Neustart-Hinweis an
+    drawHighScoreText();
     drawRestartText();
-  }
+    drawNameInput();
 
-  // Zeichnet den Hintergrund mit den bewegenden Sternen
-  void drawBackground() {
-    image(WinImage, 0, 0, width, height); // Hintergrundbild einmal zeichnen
-
-    for (Star s : stars) {
-      s.update();  // Aktualisiert die Position der Sterne
-      s.show();    // Zeichnet die Sterne
+    if (currentScore > highScore) {
+      highScore = currentScore;
+      saveHighScore();
     }
   }
 
-  // Zeichnet den Titel "You Win!" mit mehreren Effekten (wie im Beispiel)
+  void drawBackground() {
+    image(WinImage, 0, 0, width, height);
+    for (Star s : stars) {
+      s.update();
+      s.show();
+    }
+  }
+
   void drawTitle() {
-    textAlign(CENTER);  // Textzentrierung
-    textSize(130);  // Sehr große Schrift für den Titel
+    textAlign(CENTER);
+    textSize(130);
+    alpha = 150 + 105 * sin(millis() * 0.005);
 
-    alpha = 150 + 105 * sin(millis() * 0.005);  // Sinusfunktion für das Pulsieren
-
-    // Titel weiter nach oben
-    float titleY = height / 4;
-
-    // Titel mit mehreren Schatteneffekten
-    fill(0, 0, 0, alpha);
-    text("YOU WIN!", width / 2 + 5, titleY + 5);
-    fill(0, 0, 0, alpha - 50);
-    text("YOU WIN!", width / 2 + 8, titleY + 8);
-    fill(0, 0, 0, alpha - 100);
-    text("YOU WIN!", width / 2 + 12, titleY + 12);
-
-    // Umrandung dicker
     fill(255, 0, 0);
     stroke(255, 0, 0);
     strokeWeight(16);
-    text("YOU WIN!", width / 2, titleY);
+    text("YOU WIN!", width / 2, height / 4);
 
-    fill(255, 255, 0);
-    stroke(255, 255, 0);
-    strokeWeight(10);
-    text("YOU WIN!", width / 2, titleY);
-
-    // Leuchtender Haupttext
     fill(0, 255, 255, alpha);
     noStroke();
-    text("YOU WIN!", width / 2, titleY);
+    text("YOU WIN!", width / 2, height / 4);
   }
 
-  // Zeichnet den finalen Punktestand des Spiels
   void drawScore(int score) {
-    textAlign(CENTER);  // Textzentrierung
-    textSize(80);  // Noch größere Schriftgröße für den Punktestand
-
-    // Punktestand ohne Schatten und niedriger positioniert
+    textAlign(CENTER);
+    textSize(80);
     fill(255);
-    text("Final Score: " + score, width / 2, height * 2 / 3);  // Noch tiefer positioniert
+    text("Final Score: " + score, width / 2, height * 2 / 3);
   }
 
-  // Zeichnet den Neustart-Hinweis
-  void drawRestartText() {
-    textAlign(CENTER);  // Textzentrierung
-    textSize(30);  // Kleinere Schriftgröße für den Neustart-Hinweis
+  void drawHighScoreText() {
+    textSize(30);
+    fill(0, 180, 255, 180);
+    text("Highscore: " + highScore, width / 2, height / 2 + 50);
+    fill(255);
+    text("Highscore: " + highScore, width / 2, height / 2 + 47);
+  }
 
-    // Weißer Text für den Neustart-Hinweis
-    fill(255);  // Weißer Text ohne Schatten
-    text("Press ENTER to Restart", width / 2, height * 2 / 3 + 140);  // Noch tiefer positioniert
+  void drawRestartText() {
+    textAlign(CENTER);
+    textSize(30);
+    float restartAlpha = 150 + 80 * sin(millis() * 0.008);
+    fill(0, 180, 255, restartAlpha);
+    text("Press ENTER to Restart", width / 2, height * 2 / 3 + 140);
+  }
+
+  void drawNameInput() {
+    textAlign(CENTER);
+    textSize(40);
+    fill(255);
+    text("Enter Name: " + name, width / 2, height - 100);
+  }
+
+  void loadHighScore() {
+    try {
+      String[] data = loadStrings("highscore.txt");
+      if (data != null && data.length > 0) {
+        highScore = Integer.parseInt(data[0].trim());
+      }
+    }
+    catch (Exception e) {
+      println("Fehler beim Laden des Highscores: " + e.getMessage());
+      highScore = 0;
+    }
+  }
+
+  void saveHighScore() {
+    String[] data = {str(highScore)};
+    saveStrings("highscore.txt", data);
+  }
+
+  void keyPressed() {
+    if (key == ENTER) {
+      TableRow newRow = table.addRow();
+      newRow.setInt("punkte", currentScore);
+      newRow.setString("name", name);
+
+      table.sortReverse("punkte");
+      if (table.getRowCount() > 10) {
+        table.removeRow(table.getRowCount()-1);
+      }
+      saveTable(table, "data/new.csv");
+      game.triggerTransition(1);
+    }
+    if (key == BACKSPACE && name.length() > 0) {
+      name = name.substring(0, name.length() - 1);
+    }
+    if (name.length() < 10 && key >= 32 && key <= 126) {
+      name += key;
+    }
   }
 }
