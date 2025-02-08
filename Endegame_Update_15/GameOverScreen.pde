@@ -31,12 +31,12 @@ class GameOverScreen {
     }
   }
 
-  // 🔥 Hauptanzeige
+  // Hauptanzeige
   void display(int finalScore) {
     currentScore = finalScore;
     drawBackground();
 
-    float glowIntensity = 100 + 80 * sin(millis() * 0.005);
+    float glowIntensity = 100 + 80 * sin(millis() * 0);
     drawGameOverText(glowIntensity);
     drawScoreBox();
     drawHighScoreText();
@@ -48,7 +48,7 @@ class GameOverScreen {
     }
   }
 
-  // ✨ "GAME OVER" mit sanftem Glow
+  // "GAME OVER" mit sanftem Glow
   void drawGameOverText(float alpha) {
     textAlign(CENTER);
     textFont(gameFont);
@@ -95,7 +95,7 @@ class GameOverScreen {
     text("Press ENTER to Restart", width / 2, height / 2 + 130);
   }
 
-  // 🛸 Highscore-System
+  // Highscore-System
   void loadHighScore() {
     try {
       String[] data = loadStrings("highscore.txt");
