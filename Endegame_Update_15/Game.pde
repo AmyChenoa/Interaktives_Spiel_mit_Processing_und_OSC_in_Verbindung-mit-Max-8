@@ -1,4 +1,5 @@
 class Game {
+  int highScore;
   PApplet parent;
   int screen = 0;
   PImage backgroundImage;
@@ -20,8 +21,8 @@ class Game {
   boolean isTransitioning = false;
   int nextScreen = 0;
 
-  // Timer-Variablen
-  float levelTime = 30;
+  // Level-spezifische Timer
+  HashMap<Integer, Float> levelTimers;
   float timeRemaining;
   boolean levelCompleted = false;
   boolean gameStarted = false;
@@ -45,6 +46,31 @@ class Game {
     introScreen = new IntroScreen(this);
     player = new Player();
     level = new Level(1);
+
+    loadHighScore();
+
+    // Level-Timer setzen
+    levelTimers = new HashMap<>();
+    for (int i = 1; i <= 9; i++) {
+      levelTimers.put(i, 30.0); // Standardzeit pro Level (kann angepasst werden)
+    }
+  }
+
+  void loadHighScore() {
+    try {
+      String[] data = loadStrings("highscore.txt");
+      if (data != null && data.length > 0) {
+        highScore = Integer.parseInt(data[0].trim());
+      }
+    }
+    catch (Exception e) {
+      highScore = 0;
+    }
+  }
+
+  void saveHighScore() {
+    String[] data = {str(highScore)};
+    saveStrings("highscore.txt", data);
   }
 
   void setup() {
@@ -52,7 +78,7 @@ class Game {
     backgroundImage.resize(width, height);
     resetGame();
     frameRate(60);
-    timeRemaining = levelTime;
+    timeRemaining = levelTimers.get(level.levelNumber);
   }
 
   void draw() {
@@ -70,7 +96,7 @@ class Game {
   }
 
   void drawLevelTimerBar(float x, float y, float height) {
-    if (!gameStarted || screen != 3) return;  // Timer nur im Spiel anzeigen
+    if (screen != 3) return;  // Timer nur im Spiel anzeigen
 
     float margin = 20;
     float barWidth = width - x - margin;  // Fortschrittsbalken berechnen
@@ -83,7 +109,7 @@ class Game {
     textAlign(LEFT, CENTER);
     text("Remaining Time", x, y - 15);
 
-    float progressWidth = map(timeRemaining, 0, levelTime, barWidth, 0);
+    float progressWidth = map(timeRemaining, 0, levelTimers.get(level.levelNumber), barWidth, 0);
 
     // Hintergrund-Balken
     fill(220, 220, 220, 150);
@@ -159,7 +185,7 @@ class Game {
 
     backgroundImage = level.background;
 
-    timeRemaining = levelTime;
+    timeRemaining = levelTimers.get(newLevelNumber);
     gameStarted = true;
   }
 
@@ -174,15 +200,24 @@ class Game {
     }
 
 
-    // Timer runterzählen
     if (gameStarted && timeRemaining > 0) {
-      timeRemaining -= 1 / frameRate;  // Verringere Timer pro Frame
+      timeRemaining -= 1 / frameRate;
     }
+
+    drawLevelTimerBar(levelTimeBarX, levelTimeBarY, levelTimeBarHeight);
 
     player.update();
     player.display();
     drawHUD();
-    drawLevelTimerBar(levelTimeBarX, levelTimeBarY, levelTimeBarHeight);
+
+    if (timeRemaining <= 0) {
+      levelCompleted = true;
+      if (level.levelNumber < 9) {
+        switchLevel(level.levelNumber + 1);
+      } else {
+        triggerTransition(5);
+      }
+    }
 
     // Feinde spawnen
     if (frameCount % level.spawnRate == 0) {
@@ -191,15 +226,6 @@ class Game {
       }
     }
 
-    // Levelwechsel, wenn Timer abgelaufen
-    if (timeRemaining <= 0) {
-      levelCompleted = true;
-      if (level.levelNumber < 9) {
-        switchLevel(level.levelNumber + 1);
-      } else {
-        triggerTransition(5);  // Win-Screen
-      }
-    }
 
     // Feinde und Power-Ups aktualisieren
     for (int i = powerUps.size() - 1; i >= 0; i--) {
@@ -288,7 +314,7 @@ class Game {
     powerUps.clear();
     levelCompleted = false;
     screen = 0;
-    timeRemaining = levelTime;
+    timeRemaining = levelTimers.get(level.levelNumber);
     gameStarted = false;
   }
 
