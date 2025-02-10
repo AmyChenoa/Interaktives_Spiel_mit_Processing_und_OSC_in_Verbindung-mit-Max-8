@@ -95,20 +95,18 @@ class Game {
       renderScreen();
     }
   }
-
   void drawLevelTimerBar(float x, float y, float height) {
     if (screen != 3) return;  // Timer nur im Spiel anzeigen
 
     float margin = 20;
-    float barWidth = width - x - margin;  // Fortschrittsbalken berechnen
+    float barWidth = width - (x + margin);  // Stelle sicher, dass der Fortschrittsbalken nicht falsch berechnet wird
 
-    // Timer-Balken zeichnen
     y += 20;  // Nach unten verschieben
 
     fill(255);
     textSize(16);
-    textAlign(LEFT, CENTER);
-    text("Remaining Time", x, y - 15);
+    textAlign(CENTER, CENTER);  // Jetzt ist der Text mittig über der Leiste
+    text("Remaining Time", x + barWidth / 2, y - 15);
 
     float progressWidth = map(timeRemaining, 0, levelTimers.get(level.levelNumber), barWidth, 0);
 
@@ -139,7 +137,9 @@ class Game {
       isTransitioning = false;
       screen = nextScreen;
       transitionProgress = 0;
+      println("Transition beendet! Neuer Screen: " + screen);
     }
+
 
     float fadeOutAlpha = map(transitionProgress, 0, 1, 255, 0);
     float fadeInAlpha = map(transitionProgress, 0, 1, 0, 255);
@@ -308,43 +308,69 @@ class Game {
   }
 
 
-void keyPressed() {
+  void keyPressed() {
     if (screen == 0 && key == ENTER) {
-        campaignMode = true;  
-        triggerTransition(6); 
-        startGame();
+      campaignMode = true;
+      triggerTransition(6);
+      startGame();
     }
     if (screen == 6 && key == ENTER) {
-        triggerTransition(3);  
-        startGame();
+      triggerTransition(3);
+      startGame();
     }
-    if (screen == 4 && key == ENTER) {  // Game Over
-        println("ENTER gedrückt! Zurück zum Startbildschirm.");
-        resetGame();
-        triggerTransition(0);
+    if (screen == 4 && key == ENTER || key == '\n') {  // Game Over
+      println("ENTER gedrückt! Zurück zum Startbildschirm.");
+      resetGame();
+      triggerTransition(0);
+      redraw();
     }
-    if (screen == 5 && key == ENTER) {  // WIN SCREEN !!!
-        println("ENTER gedrückt! Zurück zum Startbildschirm.");
-        resetGame();
-        triggerTransition(0);
+    println("Taste gedrückt: " + key + " | Screen: " + screen);
+
+    if (screen == 5 && (key == ENTER || key == '\n')) {
+      println("ENTER erkannt! Reset wird ausgeführt.");
+      resetGame();
+      triggerTransition(0);
+      redraw();
+      println("Taste gedrückt: " + key + " | Screen: " + screen);
     }
+
     if (screen == 3 && key == ' ') {
-        player.shoot(playerBullets);
+      player.shoot(playerBullets);
     }
-}
+  }
 
   void resetGame() {
+    println("resetGame() wurde aufgerufen!");
+
+    // Spieler zurücksetzen
     player.reset();
+
+    // Listen leeren
     enemies.clear();
     playerBullets.clear();
     enemyBullets.clear();
     powerUps.clear();
-    levelCompleted = false;
-    screen = 0;  // Explizit zurücksetzen
-    timeRemaining = levelTimers.get(level.levelNumber);
-    gameStarted = false;
 
+    // Level zurücksetzen
+    level = new Level(1);
+    timeRemaining = levelTimers.get(1);
+
+    // Spielvariablen zurücksetzen
+    levelCompleted = false;
+    gameStarted = false;
+    transitionProgress = 0;
+    isTransitioning = false;
+
+    // Highscore speichern
+    saveHighScore();
+
+
+    // Screen zurücksetzen
+    screen = 0;
     println("Spiel zurückgesetzt. Neuer Screen: " + screen);
+
+    // Bildschirm neu zeichnen
+    redraw();
   }
 
 
@@ -360,16 +386,40 @@ void keyPressed() {
       bezierVertex(xPos + width, y + width / 2, xPos + width / 2, y - width / 2, xPos, y);
       endShape(CLOSE);
     }
+    // Power-Up-Timer nur anzeigen, wenn aktiv
+    if (player.shieldTimer > frameCount) {
+      drawPowerUpTimer(20, 80, 230, 12, player.shieldTimer - frameCount, player.maxShieldTimer, color(100, 180, 255)); // Blau für Schild
+    }
+    if (player.multiShotTimer > frameCount) {
+      drawPowerUpTimer(20, 100, 230, 12, player.multiShotTimer - frameCount, player.maxMultiShotTimer, color(150, 255, 100)); // Grün für Multi-Shot
+    }
   }
 
   void drawHUD() {
+    rectMode(CORNER);  // Wichtig! Stelle sicher, dass `rect()` von der oberen linken Ecke aus gezeichnet wird
     fill(40, 40, 40, 200);
     noStroke();
     rect(10, 10, 270, 120, 20);
+
     fill(255);
     textSize(24);
     textAlign(CENTER, TOP);
     text("Punkte: " + player.score, 145, 20);
+
     drawLives(100, 50, 22, player.lives);
+  }
+
+  // Power-Up Timer für ein aktives Power-Up
+  void drawPowerUpTimer(float x, float y, float barWidth, float barHeight, float timer, float maxTimer, color barColor) {
+    float timerProgress = timer / maxTimer; // Berechne den Fortschritt des Timers
+
+    // Timer-Balken (innerer farbiger Bereich)
+    fill(barColor);
+    rect(x, y, barWidth * timerProgress, barHeight, 6); // Timer-Balken nur mit fortschreitendem Wert
+
+    // Weiße Umrandung
+    stroke(255);
+    noFill();
+    rect(x, y, barWidth, barHeight, 6); // Weiße Umrandung
   }
 }

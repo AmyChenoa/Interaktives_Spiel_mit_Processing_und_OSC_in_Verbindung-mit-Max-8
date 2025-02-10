@@ -25,6 +25,7 @@ class WinScreen {
     drawHighScoreText();
     drawRestartText();
     updateHighScore();
+    if (game.screen != 5) game.screen = 5;
   }
 
   void updateHighScore() {
@@ -86,7 +87,7 @@ class WinScreen {
 
   void drawHighScoreText() {
     textSize(30);
-    String highScoreText = "Highscore: " + highScore;
+    String highScoreText = "Highscore: " + game.highScore; // Spiel-Highscore aus Game-Klasse holen
     float textWidthValue = textWidth(highScoreText);
     float boxPadding = 20;
 
@@ -100,6 +101,7 @@ class WinScreen {
     textAlign(CENTER, CENTER);
     text(highScoreText, width / 2, height / 2 + 50);
   }
+
 
   void drawRestartText() {
     textAlign(CENTER);

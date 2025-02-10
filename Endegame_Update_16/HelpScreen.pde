@@ -64,23 +64,33 @@ class HelpScreen {
     };
 
     float boxWidth = 450;
-    float boxHeight = helpTextLines.length * (textAscent() + textDescent() + 10) + 40;
-    float boxX = width / 2 - boxWidth / 2;
-    float boxY = height / 2 - boxHeight / 2 + 10; // Kästchen minimal nach oben verschoben
 
+    // Höhe berechnen, basierend auf der Anzahl der Zeilen
+    float lineHeight = textAscent() + textDescent() + 10;
+    float boxHeight = helpTextLines.length * lineHeight + 40;
+
+    float boxX = width / 2 - boxWidth / 2;
+    float boxY = height / 2 - boxHeight / 2;
+
+    // Hintergrund-Kasten zeichnen
     fill(0, 0, 0, 180);
     stroke(255);
     strokeWeight(3);
     rect(boxX, boxY, boxWidth, boxHeight, 15);
 
+    // Text anzeigen
     fill(255, 255, 255, helpTextAlpha);
     textAlign(CENTER, CENTER);
-    float textY = boxY + 20 + 15; // Text um 15 Pixel tiefer verschieben
+
+    // Vertikal mittig positionieren
+    float textY = boxY + boxHeight / 2 - (helpTextLines.length * lineHeight) / 2 + lineHeight / 2;
+
     for (String line : helpTextLines) {
       text(line, width / 2, textY);
-      textY += textAscent() + textDescent() + 10;
+      textY += lineHeight; // Zeilenabstand gleichmäßig halten
     }
   }
+
 
 
   void mousePressed() {

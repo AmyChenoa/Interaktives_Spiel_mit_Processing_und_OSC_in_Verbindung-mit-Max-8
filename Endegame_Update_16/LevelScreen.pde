@@ -31,11 +31,13 @@ class LevelScreen {
   }
 
   void display() {
+    reset();  // Alles zurücksetzen, bevor der Screen gezeichnet wird
     drawBackground();
     drawTitle();
     for (Button level : levels) level.display();
     backButton.display();
   }
+
 
   void drawBackground() {
     image(levelImage, 0, 0, width, height); // Hintergrund zeichnen
@@ -64,16 +66,40 @@ class LevelScreen {
   void mousePressed() {
     if (backButton.isClicked()) {
       game.triggerTransition(0);
+      reset();  // Falls nötig, um eine saubere Rückkehr sicherzustellen
       return;
     }
 
     for (int i = 0; i < levels.length; i++) {
       if (levels[i].isClicked()) {
         println("Level " + (i + 1) + " Start!");
-        game.switchLevel(i + 1);  // Richtigen Level-Übergang setzen
+        game.switchLevel(i + 1);
         game.triggerTransition(3);
+        reset();  // Falls nötig, um fehlerhafte Zustände zu vermeiden
         break;
       }
+    }
+  }
+
+  void reset() {
+    alpha = 0;  // Animation zurücksetzen
+
+    // Sterne neu generieren
+    for (int i = 0; i < stars.length; i++) {
+      stars[i] = new Star();
+    }
+
+    // Buttons neu setzen (damit sie immer in der richtigen Position sind)
+    backButton = new Button(20, 20, 100, 40, "BACK");
+
+    int buttonWidth = 200, buttonHeight = 50, gap = 20;
+    int startY = height / 2;
+
+    for (int i = 0; i < levels.length; i++) {
+      int row = i / 3, col = i % 3;
+      int x = (int) (width / 2 - (buttonWidth * 1.5) + col * (buttonWidth + gap));
+      int y = startY + row * (buttonHeight + gap);
+      levels[i] = new Button(x, y, buttonWidth, buttonHeight, "Level " + (i + 1));
     }
   }
 }
