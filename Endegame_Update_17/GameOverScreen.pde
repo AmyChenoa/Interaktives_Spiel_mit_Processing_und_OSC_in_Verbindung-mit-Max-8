@@ -32,9 +32,11 @@ class GameOverScreen {
 
   void keyPressed() {
     if (canRestart && key == ENTER) {
-      game.triggerTransition(0);  // Zurück zum Intro-Bildschirm
+      game.resetGame();  // Spiel sauber zurücksetzen
+      game.triggerTransition(0);  // Zurück zum Startbildschirm (nicht Intro!)
     }
   }
+
 
   void updateHighScore() {
     if (currentScore > game.highScore) {
@@ -118,7 +120,8 @@ class GameOverScreen {
       if (data != null && data.length > 0) {
         highScore = Integer.parseInt(data[0].trim());
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       println("Fehler beim Laden des Highscores: " + e.getMessage());
       highScore = 0;
     }
