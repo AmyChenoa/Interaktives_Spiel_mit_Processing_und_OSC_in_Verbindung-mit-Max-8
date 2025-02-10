@@ -10,7 +10,7 @@ class IntroScreen {
   // Konstruktor
   IntroScreen(Game game) {
     this.game = game;
-    
+
     // Sterne initialisieren
     for (int i = 0; i < stars.length; i++) {
       stars[i] = new Star();
@@ -77,43 +77,47 @@ class IntroScreen {
   }
 
   void drawStartText() {
-    textSize(30);
+    textSize(40);
     float startTextAlpha = 150 + 105 * sin(millis() * 0.003);
 
+    float textX = width / 2;
+    float textY = (height - 20) / 2 + 180;  // 🔥 Weiter nach unten, knapp über Ladebalken
+
     fill(0, 0, 0, startTextAlpha);
-    text("Das Spiel beginnt bald...", width / 2 + 3, height / 2 + 3);
+    text("Das Spiel beginnt bald...", textX + 3, textY + 3);
 
     fill(255, 0, 0, startTextAlpha);
     stroke(255, 0, 0);
     strokeWeight(4);
-    text("Das Spiel beginnt bald...", width / 2, height / 2);
+    text("Das Spiel beginnt bald...", textX, textY);
 
     fill(255, 255, 255, startTextAlpha);
     noStroke();
-    text("Das Spiel beginnt bald...", width / 2, height / 2);
+    text("Das Spiel beginnt bald...", textX, textY);
   }
+
 
   // **NEU: Verbesserter Ladebalken**
   void drawLoadingBar() {
-    float barWidth = 300;
-    float barHeight = 20;
-    float x = width / 2 - barWidth / 2;  // Mittig ausrichten
-    float y = height * 3 / 4;  // Unteres Drittel des Bildschirms
+    float barWidth = 300;  // Breite des Balkens
+    float barHeight = 20;  // Höhe des Balkens
 
-    // Hintergrund des Balkens (mit abgerundeten Ecken)
-    fill(50, 50, 50, 180);
-    stroke(0);
+    // **Weiter nach links verschieben (z.B. von +200 auf +100)**
+    float x = (width - barWidth) / 2 + 150;  // Weniger Verschiebung nach rechts
+    float y = (height - barHeight) / 2 + 230;  // Bleibt auf der gleichen Höhe
+
+    // **Hintergrund-Rahmen des Ladebalkens**
+    fill(50, 50, 50, 180);  // Dunkler Hintergrund
+    stroke(255);  // Weißer Rand
     strokeWeight(2);
-    rect(x, y, barWidth, barHeight, 10);
+    rect(x, y, barWidth, barHeight, 10);  // Neu positioniert
 
-    // Ladefortschritt (grüner Balken mit Farbverlauf)
+    // **Fortschrittsbalken (Grün)**
     noStroke();
-    for (int i = 0; i < barWidth * introProgress; i++) {
-      float colorFactor = map(i, 0, barWidth, 50, 255);
-      fill(0, colorFactor, 0);
-      rect(x + i, y, 1, barHeight, 10);
-    }
+    fill(0, 255, 0);  // Grün für Fortschritt
+    rect(x, y, barWidth * introProgress, barHeight, 10);
   }
+
 
   void update() {
     showIntro();
