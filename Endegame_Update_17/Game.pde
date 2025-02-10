@@ -1,6 +1,5 @@
 class Game {
   int highScore;
-  boolean campaignMode = false; // Kampagnenmodus deaktiviert (Einzellevel)
   PApplet parent;
   int screen = 0;
   PImage backgroundImage;
@@ -8,6 +7,8 @@ class Game {
   ArrayList<Bullet> playerBullets;
   ArrayList<Bullet> enemyBullets;
   ArrayList<PowerUp> powerUps;
+  int currentLevel = 1;  // Startlevel
+  boolean campaignMode = false; // Kampagnenmodus aktiv?
 
   Player player;
   StartScreen startScreen;
@@ -22,13 +23,11 @@ class Game {
   boolean isTransitioning = false;
   int nextScreen = 0;
 
-  // Level-spezifische Timer
   HashMap<Integer, Float> levelTimers;
   float timeRemaining;
   boolean levelCompleted = false;
   boolean gameStarted = false;
 
-  // Fortschrittsbalken
   float levelTimeBarWidth = 500;
   float levelTimeBarHeight = 20;
   float levelTimeBarX = 300;
@@ -50,12 +49,65 @@ class Game {
 
     loadHighScore();
 
-    // Level-Timer setzen
     levelTimers = new HashMap<>();
     for (int i = 1; i <= 9; i++) {
-      levelTimers.put(i, 30.0); // Standardzeit pro Level (kann angepasst werden)
+      levelTimers.put(i, 30.0);
     }
   }
+
+  void startCampaign() {
+    campaignMode = true;
+    currentLevel = 1;
+    loadLevel(currentLevel);
+    screen = 3;
+  }
+
+  void loadLevel(int levelNumber) {
+    level = new Level(levelNumber);
+    level.initializeLevel(this);
+    backgroundImage = level.background;
+    timeRemaining = levelTimers.get(levelNumber);
+    gameStarted = true;
+  }
+
+  void levelCompleted() {
+    if (campaignMode) {
+      if (currentLevel < 9) {
+        currentLevel++;
+        loadLevel(currentLevel);
+      } else {
+        triggerTransition(5); // Kampagne gewonnen
+      }
+    } else {
+      triggerTransition(5);
+    }
+  }
+
+  void keyPressed() {
+    if (screen == 0 && key == ENTER) {
+      campaignMode = true;
+      triggerTransition(6); // Intro zuerst
+    }
+
+    if (screen == 6 && key == ENTER) {
+      startCampaign(); // Danach ins Spiel wechseln
+    }
+
+    if (screen == 4 && (key == ENTER || key == '\n')) {
+      resetGame();
+      triggerTransition(0);
+    }
+
+    if (screen == 5 && (key == ENTER || key == '\n')) {
+      resetGame();
+      triggerTransition(0);
+    }
+
+    if (screen == 3 && key == ' ') {
+      player.shoot(playerBullets);
+    }
+  }
+
 
   void loadHighScore() {
     try {
@@ -225,12 +277,12 @@ class Game {
       levelCompleted = true;
       if (campaignMode) {
         if (level.levelNumber < 9) {
-          switchLevel(level.levelNumber + 1);  // Nächstes Level in der Kampagne
+          switchLevel(level.levelNumber + 1); // Starte nächstes Level
         } else {
-          triggerTransition(5);  // Spiel gewonnen
+          triggerTransition(5); // Kampagne gewonnen
         }
       } else {
-        triggerTransition(5);  // Nur ein Level gespielt -> Gewonnen-Bildschirm
+        triggerTransition(5); // Einzelnes Level gewonnen
       }
     }
 
@@ -307,38 +359,6 @@ class Game {
     }
   }
 
-
-  void keyPressed() {
-    if (screen == 0 && key == ENTER) {
-      campaignMode = true;
-      triggerTransition(6);
-      startGame();
-    }
-    if (screen == 6 && key == ENTER) {
-      triggerTransition(3);
-      startGame();
-    }
-    if (screen == 4 && key == ENTER || key == '\n') {  // Game Over
-      println("ENTER gedrückt! Zurück zum Startbildschirm.");
-      resetGame();
-      triggerTransition(0);
-      redraw();
-    }
-    println("Taste gedrückt: " + key + " | Screen: " + screen);
-
-    if (screen == 5 && (key == ENTER || key == '\n')) {
-      println("ENTER erkannt! Reset wird ausgeführt.");
-      resetGame();
-      triggerTransition(0);
-      redraw();
-      println("Taste gedrückt: " + key + " | Screen: " + screen);
-    }
-
-    if (screen == 3 && key == ' ') {
-      player.shoot(playerBullets);
-    }
-  }
-
   void resetGame() {
     println("resetGame() wurde aufgerufen!");
 
@@ -372,7 +392,6 @@ class Game {
     // Bildschirm neu zeichnen
     redraw();
   }
-
 
 
   void drawLives(float x, float y, float width, int lives) {
