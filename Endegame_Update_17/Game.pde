@@ -53,14 +53,19 @@ class Game {
     for (int i = 1; i <= 9; i++) {
       levelTimers.put(i, 30.0);
     }
+
+
+    timeRemaining = levelTimers.get(currentLevel);
   }
 
   void startCampaign() {
-    campaignMode = true;
-    currentLevel = 1;
-    loadLevel(currentLevel);
-    screen = 3;
-  }
+  campaignMode = true;
+  currentLevel = 1;
+  loadLevel(currentLevel);
+  screen = 3;
+  gameStarted = true;  // Sicherstellen, dass das Spiel startet
+}
+
 
   void loadLevel(int levelNumber) {
     level = new Level(levelNumber);
@@ -69,6 +74,7 @@ class Game {
     timeRemaining = levelTimers.get(levelNumber);
     gameStarted = true;
   }
+
 
   void levelCompleted() {
     if (campaignMode) {
@@ -132,6 +138,7 @@ class Game {
     resetGame();
     frameRate(60);
     timeRemaining = levelTimers.get(level.levelNumber);
+    println("Neues Level geladen: " + level.levelNumber + ", Zeit: " + timeRemaining);
   }
 
   void draw() {
@@ -142,11 +149,12 @@ class Game {
         backgroundImage.resize(width, height);
         image(backgroundImage, 0, 0, width, height);
       } else {
-        println(" Kein Hintergrundbild gesetzt!");
+        println("Kein Hintergrundbild gesetzt!");
       }
       renderScreen();
     }
   }
+
   void drawLevelTimerBar(float x, float y, float height) {
     if (screen != 3) return;  // Timer nur im Spiel anzeigen
 
@@ -262,10 +270,13 @@ class Game {
       println("Kein Hintergrundbild in playGame() gesetzt!");
     }
 
+if (timeRemaining > 0) {
+  timeRemaining -= 1 / frameRate;
+} else {
+  levelCompleted();
+}
 
-    if (gameStarted && timeRemaining > 0) {
-      timeRemaining -= 1 / frameRate;
-    }
+
 
     drawLevelTimerBar(levelTimeBarX, levelTimeBarY, levelTimeBarHeight);
 
@@ -274,17 +285,15 @@ class Game {
     drawHUD();
 
     if (timeRemaining <= 0) {
-      levelCompleted = true;
-      if (campaignMode) {
-        if (level.levelNumber < 9) {
-          switchLevel(level.levelNumber + 1); // Starte nächstes Level
-        } else {
-          triggerTransition(5); // Kampagne gewonnen
-        }
+      if (currentLevel < 9) {
+        currentLevel++;
+        loadLevel(currentLevel);
       } else {
-        triggerTransition(5); // Einzelnes Level gewonnen
+        triggerTransition(5); // Kampagne oder Einzelspiel gewonnen
       }
     }
+
+
 
     // Feinde spawnen
     if (frameCount % level.spawnRate == 0) {
