@@ -1,132 +1,129 @@
-// Definition der Klasse IntroScreen
 class IntroScreen {
-  Star[] stars = new Star[150];  // Array von Sternen für den Hintergrund
-  Game game;  // Referenz auf das Game-Objekt, um die Übergänge zu steuern
-  float alpha = 0;  // Transparenzwert für die Textanimationen
-  float backgroundShift = 0;  // Wert für die Bewegung des Hintergrunds
-  float introProgress = 0;  // Fortschritt des Ladebalkens
-  boolean introFinished = false;  // Flag, um zu erkennen, ob das Intro abgeschlossen ist
+  Star[] stars = new Star[150];
+  Game game;
+  float alpha = 0;
+  float backgroundShift = 0;
+  float introProgress = 0;
+  boolean introFinished = false;
+  PImage backgroundImage;  // NEU: Hintergrundbild
 
-  // Konstruktor: Initialisiert das Game-Objekt und die Sterne
+  // Konstruktor
   IntroScreen(Game game) {
-    this.game = game;  // Referenz auf das Game-Objekt zuweisen
-
-    // Initialisiert die Sterne für den Hintergrund
+    this.game = game;
+    
+    // Sterne initialisieren
     for (int i = 0; i < stars.length; i++) {
-      stars[i] = new Star();  // Erstelle 150 Sterne für den Hintergrund
+      stars[i] = new Star();
     }
+
+    // Hintergrundbild laden
+    backgroundImage = loadImage("data./intro_background.png");  // **Ersetze mit deinem Dateinamen**
   }
 
-  // Zeigt das Intro an
   void showIntro() {
-    // Hintergrundanimation mit sanften Bewegungen und Farbänderungen
     drawBackground();
-
-    // Animation für den Titeltext
     drawTitle();
-
-    // Start-Text mit pulsierender Transparenz
     drawStartText();
 
-    // Ladebalken ohne Pulsieren, langsam fortschreitend
+    // Ladebalken aktualisieren
     if (introProgress < 1) {
-      introProgress += 0.005; // Langsame Steigerung des Ladefortschritts
-      drawLoadingBar(width / 2 - 100, height * 3 / 4, 200, 20);  // Zeigt den Ladebalken an
+      introProgress += 0.005;
+      drawLoadingBar();
     } else {
-      // Wenn der Ladebalken voll ist und das Intro noch nicht abgeschlossen ist
       if (!introFinished) {
-        introFinished = true;  // Markiere das Intro als abgeschlossen
-        delay(500);  // Kurze Pause für einen Übergangseffekt
-        game.triggerTransition(3);  // Übergang zum Spiel (Bildschirm 3)
+        introFinished = true;
+        delay(500);
+        game.triggerTransition(3);
       }
     }
   }
 
-  // Zeichnet den Hintergrund mit sanften Farben und bewegenden Sternen
   void drawBackground() {
-    // Sanfter Farbverlauf, der mit der Zeit leicht verändert wird
-    float r = 20 + 30 * sin(backgroundShift * 0.003);
-    float g = 20 + 30 * cos(backgroundShift * 0.003);
-    float b = 40 + 20 * sin(backgroundShift * 0.005);
-    background(r, g, b);  // Setzt den Hintergrund auf den berechneten Farbverlauf
-
-    // Bewegt und zeigt die Sterne an
-    for (Star s : stars) {
-      s.update();  // Aktualisiert die Position jedes Sterns
-      s.show();    // Zeigt den Stern an
+    if (backgroundImage != null) {
+      image(backgroundImage, 0, 0, width, height);  // Skaliert auf Bildschirmgröße
+    } else {
+      // Fallback-Farbverlauf
+      float r = 20 + 30 * sin(backgroundShift * 0.003);
+      float g = 20 + 30 * cos(backgroundShift * 0.003);
+      float b = 40 + 20 * sin(backgroundShift * 0.005);
+      background(r, g, b);
     }
 
-    // Langsame Bewegung des Hintergrunds für den Nebeleffekt
-    backgroundShift += 0.1;  // Erhöht den Wert, um eine sanfte Bewegung zu erzeugen
+    // Sterne zeichnen
+    for (Star s : stars) {
+      s.update();
+      s.show();
+    }
+
+    backgroundShift += 0.1;
   }
 
-  // Zeichnet den Titeltext "WELTRAUM-ABENTEUER" mit pulsierenden Effekten
   void drawTitle() {
-    textAlign(CENTER);  // Text wird zentriert
-    textSize(80);  // Setzt die Textgröße auf 80 für den Titel
+    textAlign(CENTER);
+    textSize(80);
+    alpha = 150 + 105 * sin(millis() * 0.003);
 
-    // Berechnet eine pulsierende Transparenz für den Titel
-    alpha = 150 + 105 * sin(millis() * 0.003);  // Sinusfunktion für dynamische Transparenz
+    fill(0, 0, 0, alpha);
+    text("WELTRAUM-ABENTEUER", width / 2 + 5, height / 4 + 5);
 
-    // Mehrere Schatteneffekte für den Titel
-    fill(0, 0, 0, alpha);  // Schatten in Schwarz
-    text("WELTRAUM-ABENTEUER", width / 2 + 5, height / 4 + 5);  // Schatten 1
-    fill(0, 0, 0, alpha - 50);  // Etwas weniger Transparenz
-    text("WELTRAUM-ABENTEUER", width / 2 + 8, height / 4 + 8);  // Schatten 2
-    fill(0, 0, 0, alpha - 100);  // Noch weniger Transparenz
-    text("WELTRAUM-ABENTEUER", width / 2 + 12, height / 4 + 12);  // Schatten 3
+    fill(255, 255, 0);
+    stroke(255, 255, 0);
+    strokeWeight(5);
+    text("WELTRAUM-ABENTEUER", width / 2, height / 4);
 
-    // Umrandung des Textes mit weichen, leuchtenden Farben
-    fill(255, 255, 0);  // Gelbe Farbe
-    stroke(255, 255, 0);  // Gelbe Umrandung
-    strokeWeight(5);  // Dicke der Umrandung
-    text("WELTRAUM-ABENTEUER", width / 2, height / 4);  // Text mit gelber Umrandung
-
-    // Türkisfarbener, leicht transparenter Text ohne Umrandung
-    fill(0, 255, 255, alpha);  // Türkis mit pulsierender Transparenz
-    noStroke();  // Keine Umrandung
-    text("WELTRAUM-ABENTEUER", width / 2, height / 4);  // Endgültiger Text
+    fill(0, 255, 255, alpha);
+    noStroke();
+    text("WELTRAUM-ABENTEUER", width / 2, height / 4);
   }
 
-  // Zeichnet den Start-Text mit pulsierender Transparenz
   void drawStartText() {
-    textSize(30);  // Kleinere Schriftgröße für den Starttext
-    float startTextAlpha = 150 + 105 * sin(millis() * 0.003);  // Pulsierende Transparenz für den Text
+    textSize(30);
+    float startTextAlpha = 150 + 105 * sin(millis() * 0.003);
 
-    // Start-Text mit mehreren Effekten (Schatten, Umrandung, Text)
-    fill(0, 0, 0, startTextAlpha);  // Schatten in Schwarz
-    text("Das Spiel beginnt bald...", width / 2 + 3, height / 2 + 3);  // Schatten
-    fill(255, 0, 0, startTextAlpha);  // Rote Umrandung
+    fill(0, 0, 0, startTextAlpha);
+    text("Das Spiel beginnt bald...", width / 2 + 3, height / 2 + 3);
+
+    fill(255, 0, 0, startTextAlpha);
     stroke(255, 0, 0);
     strokeWeight(4);
-    text("Das Spiel beginnt bald...", width / 2, height / 2);  // Text mit roter Umrandung
-    fill(255, 255, 255, startTextAlpha);  // Weißer Text
+    text("Das Spiel beginnt bald...", width / 2, height / 2);
+
+    fill(255, 255, 255, startTextAlpha);
     noStroke();
-    text("Das Spiel beginnt bald...", width / 2, height / 2);  // Endgültiger Text
+    text("Das Spiel beginnt bald...", width / 2, height / 2);
   }
 
-  // Zeichnet einen Ladebalken für den Fortschritt
-  void drawLoadingBar(float x, float y, float width, float height) {
-    noStroke();
-    fill(50, 50, 50);  // Hintergrund des Ladebalkens (dunkelgrau)
-    rect(x, y, width, height);  // Zeichnet den Hintergrund des Ladebalkens
+  // **NEU: Verbesserter Ladebalken**
+  void drawLoadingBar() {
+    float barWidth = 300;
+    float barHeight = 20;
+    float x = width / 2 - barWidth / 2;  // Mittig ausrichten
+    float y = height * 3 / 4;  // Unteres Drittel des Bildschirms
 
-    // Ladefortschritt (grün)
-    fill(0, 255, 0);
-    rect(x, y, width * introProgress, height);  // Füllt den Ladebalken basierend auf dem Fortschritt
+    // Hintergrund des Balkens (mit abgerundeten Ecken)
+    fill(50, 50, 50, 180);
+    stroke(0);
+    strokeWeight(2);
+    rect(x, y, barWidth, barHeight, 10);
+
+    // Ladefortschritt (grüner Balken mit Farbverlauf)
+    noStroke();
+    for (int i = 0; i < barWidth * introProgress; i++) {
+      float colorFactor = map(i, 0, barWidth, 50, 255);
+      fill(0, colorFactor, 0);
+      rect(x + i, y, 1, barHeight, 10);
+    }
   }
 
-  // Wird kontinuierlich aufgerufen, um das Intro anzuzeigen
   void update() {
-    showIntro();  // Zeigt das Intro an
+    showIntro();
   }
 
-  // Startet das Spiel sofort, wenn die ENTER-Taste gedrückt wird
   void keyPressed() {
     if (key == ENTER) {
-      introFinished = true;  // Markiert das Intro als abgeschlossen
-      delay(500);  // Kurze Pause für einen Übergangseffekt
-      game.triggerTransition(3);  // Übergang zum Spiel (Bildschirm 3)
+      introFinished = true;
+      delay(500);
+      game.triggerTransition(3);
     }
   }
 }
