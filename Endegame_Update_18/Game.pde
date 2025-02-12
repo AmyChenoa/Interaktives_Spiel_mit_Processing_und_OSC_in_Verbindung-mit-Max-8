@@ -557,3 +557,4 @@ class Game {
     noFill();
     rect(x, y, barWidth, barHeight, 6);
   }
+}
