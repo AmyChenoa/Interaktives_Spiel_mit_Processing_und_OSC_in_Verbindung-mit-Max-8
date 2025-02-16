@@ -188,6 +188,8 @@ class Game {
 
     // Gibt eine Debug-Nachricht aus, die das geladene Level und die verfügbare Zeit anzeigt
     println("Neues Level geladen: " + level.levelNumber + ", Zeit: " + timeRemaining);
+    
+     sound.sendSound("ambient");
   }
 
   // Methode, die in jeder Frame-Aktualisierung ausgeführt wird
